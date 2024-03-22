@@ -243,70 +243,71 @@ class UinfoScreen extends StatelessWidget {
         ]));
   }
 
-  /// Section Widget
-  Widget _buildTwo(BuildContext context) {
-    return SizedBox(
-        height: 337.v,
-        width: 350.h,
-        child: Stack(alignment: Alignment.topCenter, children: [
-          Align(
-              alignment: Alignment.center,
-              child: Container(
-                  height: 337.v,
-                  width: 350.h,
-                  decoration: BoxDecoration(
-                      color: theme.colorScheme.onPrimaryContainer,
-                      borderRadius: BorderRadius.circular(15.h)))),
-          Align(
-              alignment: Alignment.topCenter,
-              child: Padding(
-                  padding: EdgeInsets.only(top: 15.v),
-                  child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Expanded(
-                            child: Padding(
-                                padding: EdgeInsets.only(top: 3.v),
-                                child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      _buildSixtyEight(context,
-                                          faculty: "Agreement"),
-                                      SizedBox(height: 5.v),
-                                      SizedBox(
-                                          width: 227.h,
-                                          child: Text(
-                                              "Exchange Student Undergraduate-University of Melbourne-School of Management-Outgoing",
-                                              maxLines: 2,
-                                              overflow: TextOverflow.ellipsis,
-                                              style: CustomTextStyles
-                                                  .bodySmallRobotoBlack900Regular)),
-                                      SizedBox(height: 46.v),
-                                      _buildSixtyEight(context,
-                                          faculty: "Faculty"),
-                                      SizedBox(height: 12.v),
-                                      _buildSixtyEight(context,
-                                          faculty: "Academic Program"),
-                                      SizedBox(height: 18.v),
-                                      _buildSixtyEight(context,
-                                          faculty: "Fees"),
-                                      SizedBox(height: 16.v),
-                                      _buildSixtyEight(context,
-                                          faculty: "Content")
-                                    ]))),
-                        Container(
-                            height: 98.v,
-                            width: 4.h,
-                            margin: EdgeInsets.only(left: 26.h, bottom: 183.v),
-                            decoration: BoxDecoration(
-                                color: appTheme.black900.withOpacity(0.09),
-                                borderRadius: BorderRadius.circular(2.h)))
-                      ])))
-        ]));
-  }
+ /// Section Widget
+ Widget _buildTwo(BuildContext context) {
+  return ExpansionPanelList(
+    expansionCallback: (int index, bool isExpanded) {
+      // Implement your expansion callback logic here if needed
+    },
+    children: [
+      ExpansionPanel(
+        headerBuilder: (BuildContext context, bool isExpanded) {
+          return ListTile(
+            title: Text('Agreement', style: theme.textTheme.titleLarge!.copyWith(color: appTheme.black900)),
+          );
+        },
+        body: ListTile(
+          title: Text('Panel Body 1'),
+        ),
+        isExpanded: true, // Set initial expansion state
+      ),
+      ExpansionPanel(
+        headerBuilder: (BuildContext context, bool isExpanded) {
+          return ListTile(
+            title: Text('Faculty', style: theme.textTheme.titleLarge!.copyWith(color: appTheme.black900)),
+          );
+        },
+        body: ListTile(
+          title: Text('Panel Body 2'),
+        ),
+        isExpanded: false, // Set initial expansion state
+      ),
+      ExpansionPanel(
+        headerBuilder: (BuildContext context, bool isExpanded) {
+          return ListTile(
+            title: Text('Academic Program', style: theme.textTheme.titleLarge!.copyWith(color: appTheme.black900)),
+          );
+        },
+        body: ListTile(
+          title: Text('Panel Body 2'),
+        ),
+        isExpanded: false, // Set initial expansion state
+      ),
+            ExpansionPanel(
+        headerBuilder: (BuildContext context, bool isExpanded) {
+          return ListTile(
+            title: Text('Fees', style: theme.textTheme.titleLarge!.copyWith(color: appTheme.black900)),
+          );
+        },
+        body: ListTile(
+          title: Text('Panel Body 2'),
+        ),
+        isExpanded: false, // Set initial expansion state
+      ),
+            ExpansionPanel(
+        headerBuilder: (BuildContext context, bool isExpanded) {
+          return ListTile(
+            title: Text('Faculty', style: theme.textTheme.titleLarge!.copyWith(color: appTheme.black900)),
+          );
+        },
+        body: ListTile(
+          title: Text('Panel Body 2'),
+        ),
+        isExpanded: false, // Set initial expansion state
+      ),
+    ],
+  );
+}
 
   /// Common widget
   Widget _buildSixtyEight(
