@@ -3,6 +3,8 @@ import 'package:myapp/core/app_export.dart';
 import 'package:myapp/widgets/app_bar/custom_app_bar.dart';
 import 'package:myapp/widgets/app_bar/appbar_leading_image.dart';
 
+import '../../URequirements/view/ureq_screen.dart';
+
 
 
 class UinfoScreen extends StatelessWidget {
@@ -99,25 +101,29 @@ class UinfoScreen extends StatelessWidget {
                                                                               TextDecoration.underline))
                                                             ]),
                                                             Spacer(flex: 49),
-                                                            Column(children: [
-                                                              CustomImageView(
-                                                                  imagePath:
-                                                                      ImageConstant
-                                                                          .imgGroup,
-                                                                  height: 31.v,
-                                                                  width: 30.h,
-                                                                  onTap: () {
-                                                                    onTapImgImage(
-                                                                        context);
-                                                                  }),
-                                                              SizedBox(
-                                                                  height: 3.v),
-                                                              Text(
-                                                                  "Requirements",
-                                                                  style: theme
-                                                                      .textTheme
-                                                                      .bodySmall)
-                                                            ]),
+                                                            GestureDetector(
+                                                              onTap: () {
+                                                                Navigator.push(
+                                                                  context,
+                                                                  MaterialPageRoute(builder: (context) => UReqScreen()),
+                                                                );
+                                                              },
+                                                              child: Column(
+                                                                children: [
+                                                                  CustomImageView(
+                                                                    imagePath: ImageConstant.imgGroup,
+                                                                    height: 31.v,
+                                                                    width: 30.h,
+                                                                  ),
+                                                                  SizedBox(height: 3.v),
+                                                                  Text(
+                                                                    "Requirements",
+                                                                    style: theme.textTheme.bodySmall,
+                                                                  ),
+                                                                ],
+                                                              ),
+                                                            ),
+
                                                             Spacer(flex: 50),
                                                             Column(children: [
                                                               Container(
