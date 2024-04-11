@@ -23,7 +23,7 @@ class UinfoScreen extends StatelessWidget {
                         padding: EdgeInsets.symmetric(horizontal: 18.h),
                         child: Column(children: [
                           SizedBox(
-                              height: 801.v,
+                              height: 810.v,
                               width: 375.h,
                               child: Stack(
                                   alignment: Alignment.bottomCenter,
@@ -166,7 +166,7 @@ class UinfoScreen extends StatelessWidget {
                                                 ])))
                                   ])),
                           SizedBox(height: 24.v),
-                          SizedBox(width: 108.h, child: Divider())
+                          SizedBox(width: 100.h, child: Divider())
                         ]))))));
   }
 
