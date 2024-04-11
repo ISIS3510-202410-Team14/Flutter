@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:rxdart/rxdart.dart';
 import 'package:user_repository/src/models/user.dart';
 import 'package:user_repository/src/user_repo.dart';
 
@@ -13,9 +14,22 @@ class FirebaseUserRepo implements UserRepository {
   }) : _firebaseAuth = firebaseAuth ?? FirebaseAuth.instance;
 
   @override
-  // TODO: implement user
-  Stream<MyUser?> get user => throw UnimplementedError();
- 
+  Stream<MyUser?> get user {
+    return _firebaseAuth.authStateChanges().flatMap((value) => null)
+  }
+  
+   @override
+  Future<MyUser> signUp(MyUser myUser, String password) {
+    // TODO: implement signUp
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<void> singIn(String email, String password) {
+    // TODO: implement singIn
+    throw UnimplementedError();
+  }
+
   @override
   Future<void> logOut() {
     // TODO: implement logOut
@@ -28,17 +42,7 @@ class FirebaseUserRepo implements UserRepository {
     throw UnimplementedError();
   }
 
-  @override
-  Future<MyUser> signUp(MyUser myUser, String password) {
-    // TODO: implement signUp
-    throw UnimplementedError();
-  }
 
-  @override
-  Future<void> singIn(String email, String password) {
-    // TODO: implement singIn
-    throw UnimplementedError();
-  }
 
   
   
