@@ -49,7 +49,7 @@ class SizeUtils {
 
   /// Device's Width
   static late double width;
-
+  
   static void setScreenSize(
     BoxConstraints constraints,
     Orientation currentOrientation,

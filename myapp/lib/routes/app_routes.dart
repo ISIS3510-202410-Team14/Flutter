@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:university_repository/university_repository.dart';
 import '../home/view/home_page/home_page.dart';
 import '../UniversityInfo/view/uiinfo_screen.dart';
 import '../home/view/home_container_screen/home_container_screen.dart';
@@ -17,7 +18,6 @@ class AppRoutes {
 
   static Map<String, WidgetBuilder> routes = {
 
-    uinfoScreen: (context) => UinfoScreen(),
     homeContainerScreen: (context) => HomeContainerScreen(),
 
   };
