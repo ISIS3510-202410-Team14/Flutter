@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:myapp/blocs/authentication_bloc/authentication_bloc.dart';
+import 'package:myapp/screens/auth/views/welcome_screen.dart';
+import 'package:myapp/screens/home/views/home_screen.dart';
 
 class MyAppView extends StatelessWidget {
   const MyAppView({super.key});
