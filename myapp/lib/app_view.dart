@@ -4,6 +4,10 @@ import 'package:myapp/blocs/authentication_bloc/authentication_bloc.dart';
 import 'package:myapp/screens/auth/views/welcome_screen.dart';
 import 'package:myapp/screens/home/views/home_screen.dart';
 
+import 'package:myapp/home/view/home_tab_container_page/home_tab_container_page.dart';
+import 'package:myapp/screens/home/blocs/get_university_bloc.dart';
+import 'package:university_repository/university_repository.dart';
+
 class MyAppView extends StatelessWidget {
   const MyAppView({super.key});
 
@@ -16,9 +20,21 @@ class MyAppView extends StatelessWidget {
         home: BlocBuilder<AuthenticationBloc, AuthenticationState>(
           builder: ((context, state) {
             if (state.status == AuthenticationStatus.authenticated) {
-              return HomeScreen();
+              return MultiBlocProvider(
+                providers: [
+                  //BlocProvider(
+                    //create: (context) => SignInBloc(context.read<AuthenticationBloc>().userRepository),
+                  //),
+                  BlocProvider(
+                    create: (context) => GetUniversityBloc(
+                      FirebaseUniversityRepo()
+                      )..add(GetUniversity()),
+                    ),
+                ], 
+                child: HomeTabContainerPage(),
+                );
             } else {
-              return WelcomeScreen();
+              return HomeTabContainerPage();
             }
           }),
         ));

@@ -2,12 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:myapp/core/app_export.dart';
 import 'package:myapp/widgets/app_bar/custom_app_bar.dart';
 import 'package:myapp/widgets/app_bar/appbar_leading_image.dart';
+import 'package:university_repository/university_repository.dart';
 
 import '../../UniversityInfo/view/uiinfo_screen.dart';
 
 
 class UReqScreen extends StatelessWidget {
-  const UReqScreen({Key? key}) : super(key: key);
+  final University university;
+  const UReqScreen(this.university,{Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -68,7 +70,7 @@ class UReqScreen extends StatelessWidget {
                                           Navigator.push(
                                             context,
                                             MaterialPageRoute(
-                                              builder: (context) => UinfoScreen(),
+                                              builder: (context) => UinfoScreen(university),
                                             ),
                                           );
                                         },
@@ -189,12 +191,18 @@ class UReqScreen extends StatelessWidget {
         height: 338.v,
         width: 349.h,
         child: Stack(alignment: Alignment.bottomCenter, children: [
-          CustomImageView(
-              imagePath: ImageConstant.imgImage1,
-              height: 318.v,
-              width: 349.h,
-              radius: BorderRadius.circular(15.h),
-              alignment: Alignment.topCenter),
+          Container(
+                  height: 318.v,
+                  width: 349.h,
+                  alignment: Alignment.topCenter,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(15.h),
+                  ),
+                  child: Image.network(
+                    university.image,
+                    fit: BoxFit.cover, // Ajusta la imagen para cubrir el contenedor
+                  ),
+                ),
           Align(
               alignment: Alignment.bottomCenter,
               child: Container(
@@ -216,13 +224,13 @@ class UReqScreen extends StatelessWidget {
                             child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Text("University of Melbourne",
+                                  Text(university.name,
                                       style: CustomTextStyles
                                           .bodyLargePoppinsGray900),
                                   Padding(
                                       padding: EdgeInsets.only(left: 9.h),
                                       child: Text(
-                                          "Melbourne, Victoria, Australia",
+                                          university.country,
                                           style: CustomTextStyles
                                               .bodySmallGray900))
                                 ])),
