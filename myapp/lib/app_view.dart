@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:myapp/blocs/authentication_bloc/authentication_bloc.dart';
+import 'package:myapp/screens/auth/views/welcome_screen.dart';
+import 'package:myapp/screens/home/views/home_screen.dart';
 
 import 'package:myapp/home/view/home_tab_container_page/home_tab_container_page.dart';
 import 'package:myapp/screens/home/blocs/get_university_bloc.dart';
