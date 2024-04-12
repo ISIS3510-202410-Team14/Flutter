@@ -1,4 +1,4 @@
-import 'package:myapp/screens/home/blocs/get_university_bloc.dart';
+import 'package:myapp/screens/home/blocs/get_university_bloc/get_university_bloc.dart';
 import 'package:myapp/widgets/app_bar/custom_app_bar.dart';
 import 'package:myapp/widgets/app_bar/appbar_title_searchview.dart';
 

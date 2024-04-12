@@ -1,5 +1,5 @@
 import 'package:myapp/UniversityInfo/view/uiinfo_screen.dart';
-import 'package:myapp/screens/home/blocs/get_university_bloc.dart';
+import 'package:myapp/screens/home/blocs/get_university_bloc/get_university_bloc.dart';
 
 
 import 'package:flutter/material.dart';

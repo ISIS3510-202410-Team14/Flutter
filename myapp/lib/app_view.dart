@@ -3,11 +3,12 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:myapp/blocs/authentication_bloc/authentication_bloc.dart';
 import 'package:myapp/core/utils/size_utils.dart';
 import 'package:myapp/home/view/home_container_screen/home_container_screen.dart';
+import 'package:myapp/screens/auth/blocs/sing_in_bloc/sign_in_bloc.dart';
 import 'package:myapp/screens/auth/views/welcome_screen.dart';
 import 'package:myapp/screens/home/views/home_screen.dart';
 
 import 'package:myapp/home/view/home_tab_container_page/home_tab_container_page.dart';
-import 'package:myapp/screens/home/blocs/get_university_bloc.dart';
+import 'package:myapp/screens/home/blocs/get_university_bloc/get_university_bloc.dart';
 import 'package:university_repository/university_repository.dart';
 
 class MyAppView extends StatelessWidget {
@@ -36,13 +37,12 @@ class MyAppView extends StatelessWidget {
 
           return BlocBuilder<AuthenticationBloc, AuthenticationState>(
             builder: ((context, state) {
-              //if (state.status == AuthenticationStatus.authenticated) {
-              if (true == true) {
+              if (state.status == AuthenticationStatus.authenticated) {
                 return MultiBlocProvider(
                   providers: [
-                    //BlocProvider(
-                    //create: (context) => SignInBloc(context.read<AuthenticationBloc>().userRepository),
-                    //),
+                    BlocProvider(
+                    create: (context) => SignInBloc(context.read<AuthenticationBloc>().userRepository),
+                    ),
                     BlocProvider(
                       create: (context) => GetUniversityBloc(
                         FirebaseUniversityRepo(),
@@ -52,7 +52,7 @@ class MyAppView extends StatelessWidget {
                   child: HomeContainerScreen(),
                 );
               } else {
-                return HomeContainerScreen();
+                return WelcomeScreen();
               }
             }),
           );

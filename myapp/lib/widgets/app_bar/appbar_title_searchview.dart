@@ -27,6 +27,7 @@ class AppbarTitleSearchview extends StatelessWidget {
         width: 360.h,
         controller: controller,
         hintText: "Find your exchange",
+        autofocus:  false,
       ),
     );
   }
