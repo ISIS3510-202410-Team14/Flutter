@@ -5,6 +5,7 @@ import 'package:myapp/screens/home/blocs/get_university_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:myapp/core/app_export.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:university_repository/university_repository.dart';
 
 
 class HomePage extends StatefulWidget {
@@ -47,7 +48,7 @@ class HomePageState extends State<HomePage>
                                 itemBuilder: (context, index) {
                                   return GestureDetector(
                                       onTap: () {
-                                        navigateToUInfo(context);
+                                        navigateToUInfo(context, state.universitys[index]);
                                       },
                                       child: Container(
                                         padding: EdgeInsets.symmetric(
@@ -130,10 +131,10 @@ class HomePageState extends State<HomePage>
     }
 
   /// Navigates to the uinfoScreen when the action is triggered.
-  navigateToUInfo(BuildContext context) {
+  navigateToUInfo(BuildContext context, University university) {
     Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => UinfoScreen()),
+              MaterialPageRoute(builder: (context) => UinfoScreen(university)),
             );
   }
 }
