@@ -4,7 +4,7 @@ publish_to: 'none'
 version: 1.0.0+1
 
 environment: 
-  sdk: '>= 3.0.0 <=3.3.2'
+  sdk: '>= 3.0.0 <=3.3.3'
 
 dependencies: 
 
@@ -25,6 +25,9 @@ dependencies:
 
   user_repository:
     path: packages/user_repository
+
+  university_repository:
+    path: packages/university_repository
 dev_dependencies: 
   flutter_test: 
     sdk: flutter

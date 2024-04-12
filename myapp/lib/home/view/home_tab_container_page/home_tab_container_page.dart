@@ -1,6 +1,8 @@
+import 'package:myapp/screens/home/blocs/get_university_bloc.dart';
 import 'package:myapp/widgets/app_bar/custom_app_bar.dart';
 import 'package:myapp/widgets/app_bar/appbar_title_searchview.dart';
-import 'widgets/carousel_item_widget.dart';
+
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:myapp/home/view/home_page/home_page.dart';
 import 'package:flutter/material.dart';
 import 'package:myapp/core/app_export.dart';
@@ -119,25 +121,75 @@ class HomeTabContainerPageState extends State<HomeTabContainerPage>
   Widget _buildCarousel(BuildContext context) {
     return SizedBox(
       height: 210.v,
-      child: ListView.separated(
-        padding: EdgeInsets.only(
-          left: 10.h,
-          right: 16.h,
-        ),
-        scrollDirection: Axis.horizontal,
-        separatorBuilder: (
-          context,
-          index,
-        ) {
-          return SizedBox(
-            width: 8.h,
+      child: BlocBuilder<GetUniversityBloc, GetUniversityState>(
+        builder: (context, state) {
+          if(state is GetUniversitySuccess){
+          return ListView.separated(
+            padding: EdgeInsets.only(
+              left: 10.h,
+              right: 16.h,
+            ),
+            scrollDirection: Axis.horizontal,
+            separatorBuilder: (
+              context,
+              index,
+            ) {
+              return SizedBox(
+                width: 8.h,
+              );
+            },
+            itemCount: state.universitys.length,
+            itemBuilder: (context, index) {
+              return Container(
+                width: 149,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(6),
+                ),
+                child: Stack(
+                  fit: StackFit.expand,
+                  children: [
+                    Image.network(
+                      state.universitys[index].image,
+                      fit: BoxFit.cover,
+                    ),
+                    Container(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 15,
+                      ),
+                      decoration:AppDecoration.gradientWhiteAToBlack.copyWith(
+                        borderRadius: BorderRadiusStyle.roundedBorder28,
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          Text(
+                            state.universitys[index].country,
+                            style: CustomTextStyles.titleMediumWhiteA700,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              );
+
+            },
           );
-        },
-        itemCount: 3,
-        itemBuilder: (context, index) {
-          return CarouselItemWidget();
-        },
-      ),
+        } else if(state is GetUniversityLoading) {
+              return const Center(
+                child: CircularProgressIndicator(),
+              );
+          } else {
+            return const Center(
+              child: Text(
+                "An error has occured..."
+              ),
+            );
+          }
+      }
+      )
     );
   }
 
