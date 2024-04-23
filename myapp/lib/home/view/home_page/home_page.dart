@@ -1,4 +1,4 @@
-import 'package:myapp/UniversityInfo/view/uiinfo_screen.dart';
+import 'package:myapp/screens/uinfo/views/uiinfo_screen.dart';
 import 'package:myapp/screens/home/blocs/get_university_bloc/get_university_bloc.dart';
 
 
