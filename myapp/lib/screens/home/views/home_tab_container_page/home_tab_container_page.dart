@@ -3,7 +3,7 @@ import 'package:myapp/widgets/app_bar/custom_app_bar.dart';
 import 'package:myapp/widgets/app_bar/appbar_title_searchview.dart';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:myapp/home/view/home_page/home_page.dart';
+import 'package:myapp/screens/home/views/home_page/home_page.dart';
 import 'package:flutter/material.dart';
 import 'package:myapp/core/app_export.dart';
 import 'package:myapp/UniversityInfo/view/uiinfo_screen.dart';
