@@ -6,7 +6,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:myapp/home/view/home_page/home_page.dart';
 import 'package:flutter/material.dart';
 import 'package:myapp/core/app_export.dart';
-import 'package:myapp/UniversityInfo/view/uiinfo_screen.dart';
+import 'package:myapp/screens/uinfo/views/uiinfo_screen.dart';
 
 // ignore_for_file: must_be_immutable
 class HomeTabContainerPage extends StatefulWidget {

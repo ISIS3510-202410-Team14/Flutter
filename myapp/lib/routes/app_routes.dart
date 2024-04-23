@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:university_repository/university_repository.dart';
 import '../home/view/home_page/home_page.dart';
-import '../UniversityInfo/view/uiinfo_screen.dart';
+import '../screens/uinfo/views/uiinfo_screen.dart';
 import '../home/view/home_container_screen/home_container_screen.dart';
 import '../home/view/home_tab_container_page/home_tab_container_page.dart';
 
