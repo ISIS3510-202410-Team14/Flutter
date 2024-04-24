@@ -1,90 +1,109 @@
-import 'package:myapp/screens/home/blocs/get_university_bloc/get_university_bloc.dart';
-import 'package:myapp/widgets/app_bar/custom_app_bar.dart';
-import 'package:myapp/widgets/app_bar/appbar_title_searchview.dart';
+import 'dart:convert';
 
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:myapp/screens/home/views/home_page/home_page.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:myapp/core/app_export.dart';
-import 'package:myapp/UniversityInfo/view/uiinfo_screen.dart';
+import 'package:myapp/screens/home/blocs/get_university_bloc/get_university_bloc.dart';
+import 'package:myapp/screens/home/views/home_page/home_page.dart';
+import 'package:myapp/screens/search/searchpage.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:university_repository/university_repository.dart';  // Asegúrate de que la ruta es correcta
 
-// ignore_for_file: must_be_immutable
 class HomeTabContainerPage extends StatefulWidget {
-  const HomeTabContainerPage({Key? key})
-      : super(
-          key: key,
-        );
+  const HomeTabContainerPage({Key? key}) : super(key: key);
 
   @override
   HomeTabContainerPageState createState() => HomeTabContainerPageState();
 }
 
-class HomeTabContainerPageState extends State<HomeTabContainerPage>
-    with TickerProviderStateMixin {
-  TextEditingController searchController = TextEditingController();
-
+class HomeTabContainerPageState extends State<HomeTabContainerPage> with TickerProviderStateMixin {
   late TabController tabviewController;
-
+  List<University> favoriteUniversities = [];
+  
   @override
   void initState() {
     super.initState();
     tabviewController = TabController(length: 5, vsync: this);
+    loadFavorites().then((loadedFavorites) {
+      setState(() {
+        favoriteUniversities = loadedFavorites;
+      });
+    });
+  }
+
+  @override
+  void dispose() {
+    tabviewController.dispose();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: Scaffold(
-        appBar: _buildAppBar(context),
-        body: SizedBox(
-          width: SizeUtils.width,
-          child: SingleChildScrollView(
-            padding: EdgeInsets.only(top: 40.v),
-            child: Column(
-              children: [
-                _buildArchiveCoun(context),
-                SizedBox(height: 26.v),
-                _buildCarousel(context),
-                SizedBox(height: 28.v),
-                Align(
-                  alignment: Alignment.centerLeft,
-                  child: Padding(
-                    padding: EdgeInsets.only(left: 16.h),
-                    child: Text(
-                      "Top Universities! ",
-                      style: CustomTextStyles.titleSmallPoppins,
-                    ),
-                  ),
-                ),
-                SizedBox(height: 6.v),
-                _buildTabview(context),
-                _buildTabBarView(context),
-              ],
+    return Scaffold(
+      appBar: _buildAppBar(context),
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
+            _buildArchiveCoun(context),
+            SizedBox(height: 26),
+            _buildCarousel(context),
+            SizedBox(height: 28),
+            Align(
+              alignment: Alignment.centerLeft,
+              child: Padding(
+                padding: const EdgeInsets.only(left: 16),
+                child: Text("Top Universities!", style: CustomTextStyles.titleSmallPoppins),
+              ),
             ),
-          ),
+            SizedBox(height: 6),
+            _buildTabview(context),
+            _buildTabBarView(context, favoriteUniversities),
+          ],
         ),
       ),
     );
   }
 
-  /// Section Widget
   PreferredSizeWidget _buildAppBar(BuildContext context) {
-    return CustomAppBar(
-      centerTitle: true,
-      title: AppbarTitleSearchview(
-        hintText: "Find your exchange",
-        controller: searchController,
+    return AppBar(
+      title: InkWell(
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => SearchPage()),
+          );
+        },
+        child: Container(
+          height: 40,  // Ajusta la altura según necesidad
+          padding: EdgeInsets.symmetric(horizontal: 10),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(20),
+            border: Border.all(color: Colors.grey.shade300),
+          ),
+          child: Row(
+            children: [
+              Icon(Icons.search, color: Colors.grey),
+              SizedBox(width: 10),
+              Text('Find Your Exchange', style: TextStyle(fontSize: 16, color: Colors.grey)),
+            ],
+          ),
+        ),
       ),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(20),
+      ),
+      elevation: 0,
+      automaticallyImplyLeading: false,
+      backgroundColor: Colors.transparent,
     );
   }
 
-  /// Section Widget
+
+
   Widget _buildArchiveCoun(BuildContext context) {
     return Padding(
-      padding: EdgeInsets.only(
-        left: 22.h,
-        right: 16.h,
-      ),
+      padding: EdgeInsets.only(left: 22.h, right: 16.h),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
@@ -94,11 +113,7 @@ class HomeTabContainerPageState extends State<HomeTabContainerPage>
             width: 23.h,
           ),
           Padding(
-            padding: EdgeInsets.only(
-              left: 7.h,
-              top: 4.v,
-              bottom: 5.v,
-            ),
+            padding: EdgeInsets.only(left: 7.h, top: 4.v, bottom: 5.v),
             child: Text(
               "Countries",
               style: theme.textTheme.labelLarge,
@@ -117,83 +132,65 @@ class HomeTabContainerPageState extends State<HomeTabContainerPage>
     );
   }
 
-  /// Section Widget
   Widget _buildCarousel(BuildContext context) {
     return SizedBox(
       height: 210.v,
       child: BlocBuilder<GetUniversityBloc, GetUniversityState>(
         builder: (context, state) {
-          if(state is GetUniversitySuccess){
-          return ListView.separated(
-            padding: EdgeInsets.only(
-              left: 10.h,
-              right: 16.h,
-            ),
-            scrollDirection: Axis.horizontal,
-            separatorBuilder: (
-              context,
-              index,
-            ) {
-              return SizedBox(
-                width: 8.h,
-              );
-            },
-            itemCount: state.universitys.length,
-            itemBuilder: (context, index) {
-              return Container(
-                width: 149,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(6),
-                ),
-                child: Stack(
-                  fit: StackFit.expand,
-                  children: [
-                    Image.network(
-                      state.universitys[index].image,
-                      fit: BoxFit.cover,
-                    ),
-                    Container(
-                      padding: EdgeInsets.symmetric(
-                        horizontal: 16,
-                        vertical: 15,
+          if (state is GetUniversitySuccess) {
+            return ListView.separated(
+              padding: EdgeInsets.only(left: 10.h, right: 16.h),
+              scrollDirection: Axis.horizontal,
+              separatorBuilder: (context, index) => SizedBox(width: 8.h),
+              itemCount: state.universitys.length,
+              itemBuilder: (context, index) {
+                return Container(
+                  width: 149,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(6),
+                  ),
+                  child: Stack(
+                    fit: StackFit.expand,
+                    children: [
+                      Image.network(
+                        state.universitys[index].image,
+                        fit: BoxFit.cover,
                       ),
-                      decoration:AppDecoration.gradientWhiteAToBlack.copyWith(
-                        borderRadius: BorderRadiusStyle.roundedBorder28,
+                      Container(
+                        padding: EdgeInsets.symmetric(horizontal: 16, vertical: 15),
+                        decoration: AppDecoration.gradientWhiteAToBlack.copyWith(
+                          borderRadius: BorderRadiusStyle.roundedBorder28,
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: [
+                            Text(
+                              state.universitys[index].country,
+                              style: CustomTextStyles.titleMediumWhiteA700,
+                            ),
+                          ],
+                        ),
                       ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        children: [
-                          Text(
-                            state.universitys[index].country,
-                            style: CustomTextStyles.titleMediumWhiteA700,
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              );
-
-            },
-          );
-        } else if(state is GetUniversityLoading) {
-              return const Center(
-                child: CircularProgressIndicator(),
-              );
+                    ],
+                  ),
+                );
+              },
+            );
+          } else if (state is GetUniversityLoading) {
+            return const Center(
+              child: CircularProgressIndicator(),
+            );
           } else {
             return const Center(
-              child: Text(
-                "An error has occured..."
-              ),
+              child: Text("An error has occurred..."),
             );
           }
-      }
-      )
+        },
+      ),
     );
   }
 
-  /// Section Widget
   Widget _buildTabview(BuildContext context) {
     return Container(
       height: 18.v,
@@ -204,46 +201,36 @@ class HomeTabContainerPageState extends State<HomeTabContainerPage>
         labelColor: appTheme.orange700,
         unselectedLabelColor: appTheme.black900,
         tabs: [
-          Tab(
-            child: Text(
-              "All",
-            ),
-          ),
-          Tab(
-            child: Text(
-              "Popular",
-            ),
-          ),
-          Tab(
-            child: Text(
-              "Recom",
-            ),
-          ),
-          Tab(
-            child: Text(
-              "Viewed",
-            ),
-          ),
-          Tab(
-            child: Text(
-              "Fav",
-            ),
-          ),
+          Tab(child: Text("All")),
+          Tab(child: Text("Popular")),
+          Tab(child: Text("Recom")),
+          Tab(child: Text("Viewed")),
+          Tab(child: Text("Fav")),
         ],
       ),
     );
   }
 
-  /// Section Widget
-  Widget _buildTabBarView(BuildContext context) {
+  Widget _buildTabBarView(BuildContext context, List<University> favoriteUniversities) {
     return SizedBox(
       height: 275.v,
       child: TabBarView(
         controller: tabviewController,
         children: [
           HomePage(),
+          HomePage(),
+          HomePage(),
+          HomePage(),
+          HomePage(universityList: favoriteUniversities),
         ],
       ),
     );
   }
+
+  Future<List<University>> loadFavorites() async {
+  final prefs = await SharedPreferences.getInstance();
+  List<String> favorites = prefs.getStringList('favorites') ?? [];
+  // Deserializa cada string JSON a un objeto University.
+  return favorites.map((string) => University.fromJson(json.decode(string))).toList();
+}
 }
