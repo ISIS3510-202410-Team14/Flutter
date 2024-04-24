@@ -1,4 +1,4 @@
-import 'package:myapp/home/view/home_tab_container_page/home_tab_container_page.dart';
+import 'package:myapp/screens/home/views/home_tab_container_page/home_tab_container_page.dart';
 import 'package:myapp/widgets/custom_bottom_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:myapp/core/app_export.dart';
