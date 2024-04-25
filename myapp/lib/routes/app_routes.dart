@@ -1,7 +1,12 @@
 import 'package:flutter/material.dart';
+
 import 'package:myapp/screens/home/views/home_page/home_page.dart';
 import 'package:myapp/screens/home/views/home_container_screen/home_container_screen.dart';
 import 'package:myapp/screens/home/views/home_tab_container_page/home_tab_container_page.dart';
+
+
+import '../screens/home/views/home_container_screen/home_container_screen.dart';
+
 
 import 'package:myapp/screens/search/searchpage.dart';
 
