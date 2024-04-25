@@ -4,7 +4,7 @@ publish_to: 'none'
 version: 1.0.0+1
 
 environment: 
-  sdk: '>= 3.0.0 <=3.3.3'
+  sdk: '>= 3.0.0 <=3.3.4'
 
 dependencies: 
 
@@ -12,9 +12,9 @@ dependencies:
     sdk: flutter
   
   equatable: ^2.0.5
-
+  speech_to_text: ^6.6.0
   firebase_core: ^2.16.0
-
+  permission_handler: ^9.2.0
   bloc: ^8.1.2
   flutter_bloc: ^8.0.2
 
