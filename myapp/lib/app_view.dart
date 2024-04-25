@@ -2,11 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:myapp/blocs/authentication_bloc/authentication_bloc.dart';
 import 'package:myapp/core/utils/size_utils.dart';
+import 'package:myapp/routes/app_routes.dart';
 import 'package:myapp/screens/home/views/home_container_screen/home_container_screen.dart';
 import 'package:myapp/screens/auth/blocs/sing_in_bloc/sign_in_bloc.dart';
 import 'package:myapp/screens/auth/views/welcome_screen.dart';
 import 'package:myapp/screens/home/views/home_screen.dart';
-
+import 'package:myapp/screens/search/SearchPage.dart';
 import 'package:myapp/screens/home/views/home_tab_container_page/home_tab_container_page.dart';
 import 'package:myapp/screens/home/blocs/get_university_bloc/get_university_bloc.dart';
 import 'package:myapp/screens/uinfo/views/expansion_panel.dart';
@@ -25,10 +26,11 @@ class MyAppView extends StatelessWidget {
         colorScheme: ColorScheme.light(
           background: Colors.grey.shade200,
           onBackground: Colors.black,
-          primary: Colors.blue,
+          primary: Colors.orange,
           onPrimary: Colors.white,
         ),
       ),
+      routes: AppRoutes.routes,
       home: LayoutBuilder(
         builder: (context, constraints) {
           // Llama a setScreenSize antes de acceder a width
@@ -52,6 +54,7 @@ class MyAppView extends StatelessWidget {
                     ),
                   ],
                   child: HomeContainerScreen(),
+                  //child: HomeTabContainerPage(),
                 );
               } else {
                 return WelcomeScreen();
