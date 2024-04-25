@@ -2,10 +2,11 @@ import 'dart:convert';
 import 'package:university_repository/university_repository.dart';
 import 'package:flutter/material.dart';
 import 'package:myapp/core/app_export.dart';
-import 'package:myapp/UniversityInfo/view/uiinfo_screen.dart';
+import 'package:myapp/screens/uinfo/views/uiinfo_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:myapp/screens/home/blocs/get_university_bloc/get_university_bloc.dart';
+import 'package:speech_to_text/speech_to_text.dart' as stt;
 
 class SearchPage extends StatefulWidget {
 
@@ -20,11 +21,35 @@ class _SearchPageState extends State<SearchPage> {
   final TextEditingController searchController = TextEditingController();
   Set<University> clickedUniversityNames = Set<University>();
   List<University> universities= [];
+  stt.SpeechToText _speech = stt.SpeechToText();
+  bool _isListening = false;
 
  @override
   void initState() {
     super.initState();
     context.read<GetUniversityBloc>().add(GetUniversity());
+    _speech = stt.SpeechToText();
+  }
+
+  void _listen() async {
+    if (!_isListening) {
+      bool available = await _speech.initialize(
+        onStatus: (val) => print('onStatus: $val'),
+        onError: (val) => print('onError: $val'),
+      );
+      if (available) {
+        setState(() => _isListening = true);
+        _speech.listen(
+          onResult: (val) => setState(() {
+            searchController.text = val.recognizedWords;
+            searchUni(searchController.text); // to filter results based on voice input
+          }),
+        );
+      }
+    } else {
+      setState(() => _isListening = false);
+      _speech.stop();
+    }
   }
 
   @override
@@ -35,23 +60,26 @@ class _SearchPageState extends State<SearchPage> {
           child: BlocBuilder<GetUniversityBloc, GetUniversityState>(
             builder: (context, state) {
               if (universities.length != 0){
-                return _listaU(context, universities);
-              } else{
-                if (state is GetUniversitySuccess) {
-                universities = state.universitys;
-                return _listaU(context, universities);
-              } else if (state is GetUniversityLoading) {
-                return const Center(child: CircularProgressIndicator());
-              } else {
-                return const Center(child: Text("An error has occurred..."));
+                  return _listaU(context, universities);
+                } else{
+                  if (state is GetUniversitySuccess) {
+                  universities = state.universitys;
+                  return _listaU(context, universities);
+                } else if (state is GetUniversityLoading) {
+                  return const Center(child: CircularProgressIndicator());
+                } else {
+                  return const Center(child: Text("An error has occurred..."));
+                }
               }
-              }
-
-              
             },
           ),
-          ),
-        );
+        ),
+        floatingActionButton: FloatingActionButton(
+          onPressed: _listen,
+          tooltip: 'Listen',
+          child: Icon(_isListening ? Icons.mic : Icons.mic_none),
+        ),
+      );
   }
 
 

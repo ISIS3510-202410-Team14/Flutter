@@ -37,7 +37,7 @@ class UinfoScreen extends StatelessWidget {
           children: [
             Container(
               width: MediaQuery.of(context).size.width,
-              height: MediaQuery.of(context).size.height * 0.4,
+              height: MediaQuery.of(context).size.height * 0.2,
               decoration: BoxDecoration(
                 color: Colors.black.withOpacity(1),
                 borderRadius: BorderRadius.circular(30),
@@ -49,9 +49,7 @@ class UinfoScreen extends StatelessWidget {
                   ),
                 ],
                 image: DecorationImage(
-                  image: AssetImage(
-                    'assets/images/img_rectangle_10_1.png',
-                  ),
+                  image: NetworkImage(university.image), // Changed to dynamic image URL
                   fit: BoxFit.fill,
                 ),
               ),
@@ -80,9 +78,9 @@ class UinfoScreen extends StatelessWidget {
                         Expanded(
                           flex: 2,
                           child: Text(
-                            'Universidad de la vida',
+                            university.name, // Changed to dynamic university name
                             style: theme.textTheme.titleMedium!,
-                            textAlign: TextAlign.center, // Center the text horizontally
+                            textAlign: TextAlign.center,
                           ),
                         ),
                         Expanded(
@@ -91,12 +89,12 @@ class UinfoScreen extends StatelessWidget {
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               Icon(
-                                Icons.location_on, // Add the location icon
-                                color: Colors.blue, // Change the color as needed
+                                Icons.location_on,
+                                color: Colors.blue,
                               ),
-                              SizedBox(width: 8.0), // Add spacing between icon and text
+                              SizedBox(width: 8.0),
                               Text(
-                                'Bogota',
+                                university.country,
                                 style: theme.textTheme.titleMedium!.copyWith(color: Colors.blue),
                               ),
                             ],
@@ -104,12 +102,12 @@ class UinfoScreen extends StatelessWidget {
                         ),
                       ],
                     ),
-                    SizedBox(height: 20), // Add space between the text and the icons
+                    SizedBox(height: 20),
                   ],
                 ),
               ),
             ),
-            SizedBox(height: 20), // Add space between the container and the icons
+            SizedBox(height: 20),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
@@ -189,7 +187,6 @@ class UinfoScreen extends StatelessWidget {
                 ),
               ],
             ),
-            SizedBox(height: 20), // Add space between the last row and the new widget
             Expanded(
               child: AccordionApp(),
             ),
