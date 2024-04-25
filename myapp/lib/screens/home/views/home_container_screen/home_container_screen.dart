@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:myapp/screens/home/views/home_tab_container_page/home_tab_container_page.dart';
+
+import 'package:myapp/screens/map/views/map_screen.dart';
+
 import 'package:myapp/screens/search/SearchPage.dart';
+
 import 'package:myapp/widgets/custom_bottom_bar.dart';
 import 'package:myapp/core/app_export.dart';
 
@@ -47,7 +51,7 @@ class _HomeContainerScreenState extends State<HomeContainerScreen> {
       case BottomBarEnum.Homegray5001:
         return AppRoutes.homeTabContainerPage;
       case BottomBarEnum.Locationon:
-        return AppRoutes.searchPage; // Assuming there is a location page
+        return AppRoutes.map;
       case  BottomBarEnum.Documentscanner:
         return AppRoutes.searchPage; // Assuming there is a document scanner page
       case BottomBarEnum.Lock:
@@ -61,9 +65,14 @@ class _HomeContainerScreenState extends State<HomeContainerScreen> {
     switch (currentRoute) {
       case AppRoutes.homeTabContainerPage:
         return HomeTabContainerPage();
+
+      case AppRoutes.map:
+        return MapScreen();
+
       case AppRoutes.searchPage:
         return SearchPage();
       // Add other cases as necessary
+
       default:
         return DefaultWidget(); // Default to home page if no match is found
     }
