@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:university_repository/university_repository.dart';
 import 'package:flutter/material.dart';
 import 'package:myapp/core/app_export.dart';
@@ -29,6 +30,7 @@ class _SearchPageState extends State<SearchPage> {
     super.initState();
     context.read<GetUniversityBloc>().add(GetUniversity());
     _speech = stt.SpeechToText();
+    
   }
 
   void _listen() async {
@@ -80,6 +82,7 @@ class _SearchPageState extends State<SearchPage> {
           child: Icon(_isListening ? Icons.mic : Icons.mic_none),
         ),
       );
+      
   }
 
 
