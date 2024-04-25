@@ -4,6 +4,7 @@ import 'package:myapp/widgets/app_bar/custom_app_bar.dart';
 import 'package:myapp/widgets/app_bar/appbar_leading_image.dart';
 import 'package:university_repository/university_repository.dart';
 
+import '../../UChatbot/chatbot_screen.dart';
 import '../../screens/uinfo/views/uiinfo_screen.dart';
 
 
@@ -122,31 +123,36 @@ class UReqScreen extends StatelessWidget {
                                         ],
                                       ),
                                       Spacer(flex: 50),
-                                      Column(
-                                        children: [
-                                          Container(
-                                            height: 30.adaptSize,
-                                            width: 30.adaptSize,
-                                            padding: EdgeInsets.symmetric(
-                                              horizontal: 3.h,
-                                              vertical: 2.v,
+                                      GestureDetector(
+                                        onTap: () {
+                                          Navigator.push(
+                                            context,
+                                            MaterialPageRoute(builder: (context) => ChatbotScreen()),
+                                          );
+                                        },
+                                        child: Column(
+                                          children: [
+                                            Container(
+                                              height: 30.adaptSize,
+                                              width: 30.adaptSize,
+                                              padding: EdgeInsets.symmetric(horizontal: 3.h, vertical: 2.v),
+                                              decoration: AppDecoration.fillBluegray10001.copyWith(
+                                                borderRadius: BorderRadiusStyle.roundedBorder16,
+                                              ),
+                                              child: CustomImageView(
+                                                imagePath: ImageConstant.imgGeography,
+                                                height: 26.v,
+                                                width: 23.h,
+                                                alignment: Alignment.center,
+                                              ),
                                             ),
-                                            decoration: AppDecoration.fillBluegray10001.copyWith(
-                                              borderRadius: BorderRadiusStyle.roundedBorder16,
+                                            SizedBox(height: 4.v),
+                                            Text(
+                                              "Chatbot",
+                                              style: theme.textTheme.bodySmall,
                                             ),
-                                            child: CustomImageView(
-                                              imagePath: ImageConstant.imgGeography,
-                                              height: 26.v,
-                                              width: 23.h,
-                                              alignment: Alignment.center,
-                                            ),
-                                          ),
-                                          SizedBox(height: 4.v),
-                                          Text(
-                                            "Internationalization",
-                                            style: theme.textTheme.bodySmall,
-                                          ),
-                                        ],
+                                          ],
+                                        ),
                                       ),
                                     ],
                                   ),
