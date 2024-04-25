@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:myapp/screens/home/views/home_tab_container_page/home_tab_container_page.dart';
 
 import 'package:myapp/screens/map/views/map_screen.dart';
+import 'package:myapp/screens/UChatbot/views/chatbot_screen.dart';
 
 import 'package:myapp/screens/search/SearchPage.dart';
 
@@ -55,7 +56,7 @@ class _HomeContainerScreenState extends State<HomeContainerScreen> {
       case  BottomBarEnum.Documentscanner:
         return AppRoutes.searchPage; // Assuming there is a document scanner page
       case BottomBarEnum.Lock:
-        return AppRoutes.searchPage; // Assuming there is a lock page
+        return AppRoutes.chatbotScreen;
       default:
         return AppRoutes.homeTabContainerPage;
     }
@@ -71,6 +72,9 @@ class _HomeContainerScreenState extends State<HomeContainerScreen> {
 
       case AppRoutes.searchPage:
         return SearchPage();
+
+      case AppRoutes.chatbotScreen:
+        return ChatbotScreen();
       // Add other cases as necessary
 
       default:

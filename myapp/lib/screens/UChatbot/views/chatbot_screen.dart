@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'openai.dart';
+import '../openai.dart';
 
 class ChatbotScreen extends StatefulWidget {
   const ChatbotScreen({Key? key}) : super(key: key);
@@ -10,8 +10,15 @@ class ChatbotScreen extends StatefulWidget {
 
 class _ChatbotScreenState extends State<ChatbotScreen> {
   TextEditingController _textEditingController = TextEditingController();
-  List<String> _conversation = [];
+  List<Map<String, String>> _conversation = [];
   bool _showInitialMessage = true;
+  late ScrollController _scrollController;
+
+  @override
+  void initState() {
+    super.initState();
+    _scrollController = ScrollController();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -21,13 +28,12 @@ class _ChatbotScreenState extends State<ChatbotScreen> {
         children: [
           Column(
             children: [
+              SizedBox(height: MediaQuery.of(context).padding.top + 16),
               Expanded(
                 child: ListView.builder(
                   itemCount: _conversation.length,
                   itemBuilder: (context, index) {
-                    return ListTile(
-                      title: Text(_conversation[index]),
-                    );
+                    return _buildMessageBubble(_conversation[index]);
                   },
                 ),
               ),
@@ -79,6 +85,40 @@ class _ChatbotScreenState extends State<ChatbotScreen> {
     );
   }
 
+  Widget _buildMessageBubble(Map<String, String> message) {
+    final isUserMessage = message['sender'] == 'User';
+    final color = isUserMessage ? Colors.white : Color(0xFFFFE7C4);
+    final alignment = isUserMessage ? MainAxisAlignment.end : MainAxisAlignment.start;
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4.0, horizontal: 8.0),
+      child: Row(
+        mainAxisAlignment: alignment,
+        children: [
+          Container(
+            decoration: BoxDecoration(
+              color: color,
+              borderRadius: BorderRadius.circular(8.0),
+              boxShadow: isUserMessage
+                  ? [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.1),
+                  spreadRadius: 1,
+                  blurRadius: 2,
+                  offset: Offset(0, 1),
+                ),
+              ]
+                  : [],
+            ),
+            padding: const EdgeInsets.all(12.0),
+            margin: isUserMessage ? EdgeInsets.only(left: 100.0) : EdgeInsets.only(right: 100.0),
+            child: Text(message['content']!),
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _buildInitialMessage() {
     return Positioned(
       top: MediaQuery.of(context).size.height * 0.4,
@@ -100,7 +140,7 @@ class _ChatbotScreenState extends State<ChatbotScreen> {
   void _sendMessage() async {
     setState(() async {
       String message = _textEditingController.text;
-      _conversation.add('User: $message');
+      _conversation.add({'sender': 'User', 'content': message});
 
       if (_showInitialMessage) {
         _showInitialMessage = false;
@@ -108,13 +148,26 @@ class _ChatbotScreenState extends State<ChatbotScreen> {
 
       try {
         String botResponse = await OpenAI.getCompletion(message);
-        _conversation.add('Chatbot: $botResponse');
+        _conversation.add({'sender': 'Chatbot', 'content': botResponse});
       } catch (e) {
         print('Error: $e');
-        _conversation.add('Chatbot: Error occurred while fetching response');
+        _conversation.add({'sender': 'Chatbot', 'content': 'Error occurred while fetching response'});
       }
 
       _textEditingController.clear();
+      _scrollToBottom();
+    });
+  }
+
+  void _scrollToBottom() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (_scrollController.hasClients) {
+        _scrollController.animateTo(
+          _scrollController.position.maxScrollExtent,
+          duration: Duration(milliseconds: 300),
+          curve: Curves.easeOut,
+        );
+      }
     });
   }
 }

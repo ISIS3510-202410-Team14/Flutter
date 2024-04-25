@@ -8,10 +8,8 @@ class OpenAI {
   static final String apiVersion = '2023-03-15-preview';
 
   static Future<String> getCompletion(String message, {String model = 'gpt-35-turbo-16k-rfmanrique', String userRole = 'user'}) async {
-    // Definir el prompt
     final String prompt = "You are a chatbot designed to assist students of Universidad de los Andes who are seeking international exchange opportunities. Your role is to provide information on available countries and universities, as well as answer specific questions regarding each university's application requirements. These requirements may include possessing a valid passport, providing proof of English proficiency, maintaining a GPA above 4, obtaining health insurance, and submitting academic transcripts. Your task is to guide students through the application process and address any inquiries they may have regarding the exchange program.";
 
-    // Crear el mensaje inicial con el prompt y el rol del usuario
     final List<Map<String, dynamic>> messages = [
       {'role': userRole, 'content': prompt},
     ];
