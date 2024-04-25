@@ -9,6 +9,7 @@ import 'package:myapp/screens/home/views/home_screen.dart';
 
 import 'package:myapp/screens/home/views/home_tab_container_page/home_tab_container_page.dart';
 import 'package:myapp/screens/home/blocs/get_university_bloc/get_university_bloc.dart';
+import 'package:myapp/screens/map/views/map_screen.dart';
 import 'package:myapp/screens/uinfo/views/expansion_panel.dart';
 import 'package:myapp/screens/uinfo/views/uiinfo_screen.dart';
 import 'package:university_repository/university_repository.dart';
