@@ -42,4 +42,6 @@ class UniversityEntity {
       factsheet: doc['factsheet'],
     );
   }
+
+
 }

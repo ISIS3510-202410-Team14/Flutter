@@ -43,4 +43,28 @@ class University {
       factsheet: entity.factsheet,
     );
   }
+
+    // Convertir un objeto University en un mapa JSON.
+  Map<String, dynamic> toJson() => {
+    'universityId': universityId,
+    'name': name,
+    'image': image,
+    'country': country,
+    'description': description,
+    'url': url,
+    'factsheet': factsheet,
+  };
+
+  // Crear un objeto University a partir de un mapa JSON.
+  factory University.fromJson(Map<String, dynamic> json) {
+    return University(
+      universityId: json['universityId'],
+      name: json['name'],
+      image: json['image'],
+      country: json['country'],
+      description: json['description'],
+      url: json['url'],
+      factsheet: json['factsheet'],
+    );
+  }
 }
