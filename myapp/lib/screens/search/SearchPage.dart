@@ -24,7 +24,7 @@ class _SearchPageState extends State<SearchPage> {
  @override
   void initState() {
     super.initState();
-    
+    context.read<GetUniversityBloc>().add(GetUniversity());
   }
 
   @override
@@ -32,7 +32,24 @@ class _SearchPageState extends State<SearchPage> {
     return Scaffold(
       appBar: _buildAppBar(context),
       body: SingleChildScrollView( // Permite que el contenido interior se desplace si es necesario
-          child: _listaU(context, universities),
+          child: BlocBuilder<GetUniversityBloc, GetUniversityState>(
+            builder: (context, state) {
+              if (universities.length != 0){
+                return _listaU(context, universities);
+              } else{
+                if (state is GetUniversitySuccess) {
+                universities = state.universitys;
+                return _listaU(context, universities);
+              } else if (state is GetUniversityLoading) {
+                return const Center(child: CircularProgressIndicator());
+              } else {
+                return const Center(child: Text("An error has occurred..."));
+              }
+              }
+
+              
+            },
+          ),
           ),
         );
   }
@@ -189,12 +206,14 @@ Future<List<University>> loadFavorites() async {
 }
 
   void searchUni(String query) {
-    final suggestions = universities.where((university) { 
+  
+    final suggestions = universities.where((university) {
       final uniName = university.name.toLowerCase();
       final input = query.toLowerCase();
       return uniName.contains(input);
     }).toList();
 
     setState(() => universities = suggestions);
-  }
+  
+}
 }
