@@ -1,4 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:myapp/core/utils/image_constant.dart';
+import 'package:myapp/core/utils/size_utils.dart';
+import 'package:myapp/widgets/custom_image_view.dart';
+
+import '../theme/custom_text_style.dart';
+import '../theme/theme_helper.dart';
 
 class CustomSearchView extends StatelessWidget {
   CustomSearchView({
