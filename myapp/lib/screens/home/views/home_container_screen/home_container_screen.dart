@@ -1,4 +1,5 @@
 import 'package:myapp/screens/home/views/home_tab_container_page/home_tab_container_page.dart';
+import 'package:myapp/screens/map/views/map_screen.dart';
 import 'package:myapp/widgets/custom_bottom_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:myapp/core/app_export.dart';
@@ -36,7 +37,7 @@ class HomeContainerScreen extends StatelessWidget {
       case BottomBarEnum.Homegray5001:
         return AppRoutes.homeTabContainerPage;
       case BottomBarEnum.Locationon:
-        return "/";
+        return AppRoutes.map;
       case BottomBarEnum.Documentscanner:
         return "/";
       case BottomBarEnum.Lock:
@@ -51,6 +52,8 @@ class HomeContainerScreen extends StatelessWidget {
     switch (currentRoute) {
       case AppRoutes.homeTabContainerPage:
         return HomeTabContainerPage();
+      case AppRoutes.map:
+        return MapScreen();
       default:
         return DefaultWidget();
     }
