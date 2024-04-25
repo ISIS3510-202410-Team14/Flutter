@@ -28,6 +28,7 @@ dependencies:
 
   university_repository:
     path: packages/university_repository
+  accordion: ^2.6.0
 dev_dependencies: 
   flutter_test: 
     sdk: flutter
