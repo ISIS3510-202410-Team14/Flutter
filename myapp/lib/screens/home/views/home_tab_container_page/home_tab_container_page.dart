@@ -8,6 +8,7 @@ import 'package:myapp/screens/home/views/home_page/home_page.dart';
 import 'package:myapp/screens/search/searchpage.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:university_repository/university_repository.dart';  // Asegúrate de que la ruta es correcta
+import 'package:firebase_performance/firebase_performance.dart';
 
 class HomeTabContainerPage extends StatefulWidget {
   const HomeTabContainerPage({Key? key}) : super(key: key);
@@ -19,11 +20,15 @@ class HomeTabContainerPage extends StatefulWidget {
 class HomeTabContainerPageState extends State<HomeTabContainerPage> with TickerProviderStateMixin {
   late TabController tabviewController;
   List<University> favoriteUniversities = [];
-  
+  late Trace userInteractionTrace;
+
   @override
   void initState() {
     super.initState();
     tabviewController = TabController(length: 5, vsync: this);
+    tabviewController.addListener(_handleTabSelection);
+    userInteractionTrace = FirebasePerformance.instance.newTrace("tab_interaction_time");
+    userInteractionTrace.start();  // Iniciar el rastro cuando la vista se carga
     loadFavorites().then((loadedFavorites) {
       setState(() {
         favoriteUniversities = loadedFavorites;
@@ -233,4 +238,10 @@ class HomeTabContainerPageState extends State<HomeTabContainerPage> with TickerP
   // Deserializa cada string JSON a un objeto University.
   return favorites.map((string) => University.fromJson(json.decode(string))).toList();
 }
+
+ void _handleTabSelection() {
+    if (tabviewController.indexIsChanging) {
+      userInteractionTrace.stop();  // Detener y enviar el rastro cuando se selecciona una pestaña
+    }
+  }
 }

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:myapp/core/app_export.dart';
 import 'package:myapp/screens/uinfo/views/expansion_panel.dart';
 import 'package:myapp/widgets/app_bar/custom_app_bar.dart';
@@ -12,12 +11,18 @@ import 'package:flutter/material.dart';
 import 'package:accordion/accordion.dart';
 import 'package:accordion/controllers.dart';
 
+import 'package:firebase_analytics/firebase_analytics.dart';
 class UinfoScreen extends StatelessWidget {
   final University university;
-  const UinfoScreen(this.university, {Key? key}) : super(key: key);
+  final FirebaseAnalytics analytics = FirebaseAnalytics.instance;
+  UinfoScreen(this.university, {Key? key}) : super(key: key);
 
+  
   @override
   Widget build(BuildContext context) {
+     analytics.logEvent(name: 'uinfo_screen_entered', parameters: {
+      'university_id': university.universityId,
+    });
     final theme = Theme.of(context);
 
     return Scaffold(
@@ -26,6 +31,9 @@ class UinfoScreen extends StatelessWidget {
         leading: IconButton(
           icon: Icon(Icons.arrow_back_ios),
           onPressed: () {
+            analytics.logEvent(name: 'uinfo_screen_abandoned', parameters: {
+              'university_id': university.universityId,
+            });
             Navigator.of(context).pop();
           },
         ),
@@ -113,6 +121,9 @@ class UinfoScreen extends StatelessWidget {
               children: [
                 GestureDetector(
                   onTap: () {
+                    analytics.logEvent(name: 'requirements_clicked', parameters: {
+                      'university_id': university.universityId,
+                    });
                     Navigator.push(
                       context,
                       MaterialPageRoute(builder: (context) => UReqScreen(university)),
