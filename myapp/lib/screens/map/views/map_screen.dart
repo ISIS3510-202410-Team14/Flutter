@@ -18,6 +18,8 @@ class _MapScreenState extends State<MapScreen> {
   static const LatLng _PLosAndes = const LatLng(4.6018, -74.0663);
   static const LatLng _pUniversidadDePorto= const LatLng(41.1783, -8.5981);
   static const LatLng _pMelbourne = const LatLng(-37.7963, 144.9614);
+  static const LatLng _pUniversidadJaveriana = const LatLng(4.6385, -74.0821);
+
 
   LatLng? _currentP;
   Map<PolylineId, Polyline> _polylines = {};
@@ -42,6 +44,7 @@ class _MapScreenState extends State<MapScreen> {
               Marker(markerId: const MarkerId('_PLosAndes'), position: _PLosAndes),
               Marker(markerId: const MarkerId('_pUniversidadDePorto'), position: _pUniversidadDePorto),
               Marker(markerId: const MarkerId('_pMelbourne'), position: _pMelbourne),
+              Marker(markerId: const MarkerId('_pUniversidadJaveriana'), position: _pUniversidadJaveriana),
               if (_currentP != null) Marker(markerId: const MarkerId('_currentP'), position: _currentP!),
             },
             polylines: Set<Polyline>.of(_polylines.values),
