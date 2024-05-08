@@ -124,7 +124,7 @@ class HomePageState extends State<HomePage> with AutomaticKeepAliveClientMixin<H
                                   onTap: () async {
                                   setState(() {
                                   clickedUniversityNames.add(universities[index]);
-                                  print("Added to fav");
+                                  
                                   });
                                   await saveToFavorites(universities[index]);
                                   },
@@ -146,13 +146,28 @@ class HomePageState extends State<HomePage> with AutomaticKeepAliveClientMixin<H
 
   }
   Future<void> saveToFavorites(University university) async {
-    final prefs = await SharedPreferences.getInstance();
-    List<String> favorites = prefs.getStringList('favorites') ?? [];
-    // Serializa la universidad a un string JSON y guárdalo.
+  final prefs = await SharedPreferences.getInstance();
+  List<String> favorites = prefs.getStringList('favorites') ?? [];
+  
+  // Deserializa las universidades para verificar duplicados por ID.
+  List<University> favoriteUniversities = favorites.map((string) => University.fromJson(json.decode(string))).toList();
+  
+  // Verifica si la universidad ya está en favoritos.
+  bool isAlreadyFavorite = favoriteUniversities.any((u) => u.universityId == university.universityId);
+  
+  if (!isAlreadyFavorite) {
+    // Serializa la universidad a un string JSON y agrégalo si no está duplicado.
     String universityJson = json.encode(university.toJson());
     favorites.add(universityJson);
     await prefs.setStringList('favorites', favorites);
+    print('University with ID ${university.universityId} will be added in the favorites list.');
+  }
+  else {
+    // Imprime un mensaje en la consola si la universidad ya está en favoritos.
+    print('University with ID ${university.universityId} is already in the favorites list and will not be added again.');
+  }
 }
+
 
 Future<List<University>> loadFavorites() async {
   final prefs = await SharedPreferences.getInstance();
