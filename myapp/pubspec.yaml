@@ -10,7 +10,12 @@ dependencies:
 
   flutter: 
     sdk: flutter
-  
+
+
+  http: ^1.0.0
+  path_provider: ^2.0.2
+  connectivity_plus: ^2.0.2
+
   google_maps_flutter: ^2.5.0
   location: ^5.0.0
   flutter_polyline_points: ^2.0.0
@@ -50,6 +55,7 @@ flutter:
   assets: 
     - assets/
     - assets/images/
+    - assets/files/MOCK_DATA.json
   fonts: 
     - family: Poppins
       fonts: 
