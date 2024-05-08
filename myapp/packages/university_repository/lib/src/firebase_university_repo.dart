@@ -18,4 +18,19 @@ class FirebaseUniversityRepo implements UniversityRepo {
       rethrow;
     }
   }
+
+   Future<void> addUniversity(University university) async {
+    try {
+      await universityCollection.doc().set(university.toJson());
+      
+    } catch (e) {
+      log(e.toString());
+    }
+  }
+
+  Future<void> addMultipleUniversities(List<University> universities) async {
+    for (var university in universities) {
+      await addUniversity(university);
+    }
+  }
 }

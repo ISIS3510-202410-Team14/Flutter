@@ -8,6 +8,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:myapp/screens/home/blocs/get_university_bloc/get_university_bloc.dart';
 import 'package:speech_to_text/speech_to_text.dart' as stt;
+import 'dart:io';
+import 'package:myapp/widgets/image_service.dart';
 
 class SearchPage extends StatefulWidget {
 
@@ -19,6 +21,7 @@ class SearchPage extends StatefulWidget {
 }
 
 class _SearchPageState extends State<SearchPage> {
+  final ImageService _imageService = ImageService();
   final TextEditingController searchController = TextEditingController();
   Set<University> clickedUniversityNames = Set<University>();
   List<University> universities= [];
@@ -134,92 +137,105 @@ void navigateToUInfo(BuildContext context, University university) {
     );
   }
 
-Widget _listaU(BuildContext context, List<University> universities){
-    return Column(
-                  children: [
-                    SizedBox(height: 18.v),
-                    Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 16.h),
-                      child: ListView.separated(
-                        physics: NeverScrollableScrollPhysics(), // Deshabilita el desplazamiento propio del ListView
-                        shrinkWrap: true, // Permite que ListView ocupe solo el espacio de sus hijos
-                        separatorBuilder: (context, index) => Padding(
-                          padding: EdgeInsets.symmetric(vertical: 5.0.v),
-                          child: SizedBox(width: 108.h),
+Widget _listaU(BuildContext context, List<University> universities) {
+  return Column(
+    children: [
+      SizedBox(height: 18.v),
+      Padding(
+        padding: EdgeInsets.symmetric(horizontal: 16.h),
+        child: ListView.separated(
+          physics: NeverScrollableScrollPhysics(),
+          shrinkWrap: true,
+          separatorBuilder: (context, index) => Padding(
+            padding: EdgeInsets.symmetric(vertical: 5.0.v),
+            child: SizedBox(width: 108.h),
+          ),
+          itemCount: universities.length,
+          itemBuilder: (context, index) {
+            String localFileName = 'uni_${universities[index].universityId}.jpg';
+            return FutureBuilder<File>(
+              future: _imageService.loadImage(universities[index].image, localFileName),
+              builder: (context, snapshot) {
+                Widget imageWidget;
+                if (snapshot.connectionState == ConnectionState.done && snapshot.hasData) {
+                  imageWidget = Image.file(snapshot.data!, fit: BoxFit.cover);
+                } else if (snapshot.hasError || !snapshot.hasData) {
+                  // Fallback to network image or a placeholder if local loading fails
+                  imageWidget = Image.network(universities[index].image, fit: BoxFit.cover);
+                } else {
+                  imageWidget = Image.network(universities[index].image, fit: BoxFit.cover);
+                }
+                return Container(
+                  padding: EdgeInsets.symmetric(horizontal: 10.h, vertical: 8.v),
+                  decoration: AppDecoration.fillOrangeC.copyWith(
+                    borderRadius: BorderRadiusStyle.roundedBorder16,
+                  ),
+                  child: Row(
+                    children: [
+                      Container(
+                        height: 48,
+                        width: 79,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(6),
                         ),
-                        itemCount: universities.length,
-                        itemBuilder: (context, index) => Container(
-                          padding: EdgeInsets.symmetric(horizontal: 10.h, vertical: 8.v),
-                          decoration: AppDecoration.fillOrangeC.copyWith(
-                            borderRadius: BorderRadiusStyle.roundedBorder16,
-                          ),
-                          child: Row(
-                            children: [
-                              Container(
-                                height: 48,
-                                width: 79,
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(6),
-                                ),
-                                child:GestureDetector(
-                                        onTap: () => navigateToUInfo(context, universities[index]), 
-                                        child: Image.network(
-                                  universities[index].image,
-                                  fit: BoxFit.cover,
-                                ),
-                                ),
-                              ),
-                              Padding(
-                                padding: EdgeInsets.only(left: 13.h, top: 11.v, bottom: 11.v),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    GestureDetector(
-                                      onTap: () => navigateToUInfo(context, universities[index]),
-                                      child: Text(
-                                        universities[index].name,
-                                        style: theme.textTheme.labelLarge,
-                                      ),
-                                    ),
-                                    Padding(
-                                      padding: EdgeInsets.only(left: 2.h),
-                                      child: GestureDetector(
-                                        onTap: () => navigateToUInfo(context, universities[index]),
-                                        child: Text(
-                                          universities[index].description,
-                                          style: CustomTextStyles.bodySmallRobotoBlack900,
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              Spacer(),
-                                GestureDetector(
-                                  onTap: () async {
-                                  setState(() {
-                                  clickedUniversityNames.add(universities[index]);
-                                  print("Added to fav");
-                                  });
-                                  await saveToFavorites(universities[index]);
-                                  },
-                                child:CustomImageView(
-                                  imagePath: ImageConstant.imgSignal,
-                                  height: 19.v,
-                                  width: 20.h,
-                                  margin: EdgeInsets.only(top: 15.v, right: 17.h, bottom: 13.v),
-                                ),
-                              ),
-                            ],
-                          ),
+                        child: GestureDetector(
+                          onTap: () => navigateToUInfo(context, universities[index]), 
+                          child: imageWidget,
                         ),
-
                       ),
-                    ),
-                  ],
+                      Padding(
+                        padding: EdgeInsets.only(left: 13.h, top: 11.v, bottom: 11.v),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            GestureDetector(
+                              onTap: () => navigateToUInfo(context, universities[index]),
+                              child: Text(
+                                universities[index].name,
+                                style: theme.textTheme.labelLarge,
+                              ),
+                            ),
+                            Padding(
+                              padding: EdgeInsets.only(left: 2.h),
+                              child: GestureDetector(
+                                onTap: () => navigateToUInfo(context, universities[index]),
+                                child: Text(
+                                  universities[index].description,
+                                  style: CustomTextStyles.bodySmallRobotoBlack900,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      Spacer(),
+                      GestureDetector(
+                        onTap: () async {
+                          setState(() {
+                            clickedUniversityNames.add(universities[index]);
+                            print("Added to fav");
+                          });
+                          await saveToFavorites(universities[index]);
+                        },
+                        child: CustomImageView(
+                          imagePath: ImageConstant.imgSignal,
+                          height: 19.v,
+                          width: 20.h,
+                          margin: EdgeInsets.only(top: 15.v, right: 17.h, bottom: 13.v),
+                        ),
+                      ),
+                    ],
+                  ),
                 );
+              },
+            );
+          },
+        ),
+      ),
+    ],
+  );
+}
 
-  }
   Future<void> saveToFavorites(University university) async {
     final prefs = await SharedPreferences.getInstance();
     List<String> favorites = prefs.getStringList('favorites') ?? [];
@@ -237,7 +253,11 @@ Future<List<University>> loadFavorites() async {
 }
 
   void searchUni(String query) {
-  
+    // Verificar si el query está vacío o solo contiene espacios en blanco
+    if (query.trim().isEmpty) {
+        return; // Salir de la función si el query es vacío
+    }
+
     final suggestions = universities.where((university) {
       final uniName = university.name.toLowerCase();
       final input = query.toLowerCase();
@@ -245,6 +265,6 @@ Future<List<University>> loadFavorites() async {
     }).toList();
 
     setState(() => universities = suggestions);
-  
 }
+
 }
