@@ -1,4 +1,6 @@
 import '../entities/entities.dart';
+import 'dart:convert';
+import 'package:flutter/services.dart';
 
 class University {
   String universityId;
@@ -67,4 +69,10 @@ class University {
       factsheet: json['factsheet'],
     );
   }
+}
+
+Future<List<University>> loadUniversities(String path) async {
+  final jsonString = await rootBundle.loadString(path);
+  final List<dynamic> jsonResponse = json.decode(jsonString);
+  return jsonResponse.map((json) => University.fromJson(json)).toList();
 }

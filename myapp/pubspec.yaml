@@ -46,6 +46,7 @@ flutter:
   assets: 
     - assets/
     - assets/images/
+    - assets/files/MOCK_DATA.json
   fonts: 
     - family: Poppins
       fonts: 

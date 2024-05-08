@@ -132,7 +132,7 @@ class HomePageState extends State<HomePage> with AutomaticKeepAliveClientMixin<H
                                   imagePath: ImageConstant.imgSignal,
                                   height: 19.v,
                                   width: 20.h,
-                                  margin: EdgeInsets.only(top: 15.v, right: 17.h, bottom: 13.v),
+                                  margin: EdgeInsets.only(top: 15.v, bottom: 13.v),
                                 ),
                               ),
                             ],

@@ -101,10 +101,14 @@ class UinfoScreen extends StatelessWidget {
                                 color: Colors.blue,
                               ),
                               SizedBox(width: 8.0),
-                              Text(
+                              Expanded(
+                                flex: 2,
+                                child: Text(
                                 university.country,
                                 style: theme.textTheme.titleMedium!.copyWith(color: Colors.blue),
+                                ),
                               ),
+                              
                             ],
                           ),
                         ),
