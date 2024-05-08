@@ -233,11 +233,17 @@ class HomeTabContainerPageState extends State<HomeTabContainerPage> with TickerP
   }
 
   Future<List<University>> loadFavorites() async {
-  final prefs = await SharedPreferences.getInstance();
-  List<String> favorites = prefs.getStringList('favorites') ?? [];
-  // Deserializa cada string JSON a un objeto University.
-  return favorites.map((string) => University.fromJson(json.decode(string))).toList();
-}
+    final prefs = await SharedPreferences.getInstance();
+    List<String> favorites = prefs.getStringList('favorites') ?? [];
+    // Utiliza un Set para eliminar duplicados.
+    Set<University> uniqueFavorites = {};
+    for (String string in favorites) {
+      uniqueFavorites.add(University.fromJson(json.decode(string)));
+    }
+    // Convierte el Set a una lista antes de devolverla.
+    return uniqueFavorites.toList();
+  }
+
 
  void _handleTabSelection() {
     if (tabviewController.indexIsChanging) {

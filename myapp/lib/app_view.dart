@@ -6,7 +6,7 @@ import 'package:myapp/routes/app_routes.dart';
 import 'package:myapp/screens/home/views/home_container_screen/home_container_screen.dart';
 import 'package:myapp/screens/auth/blocs/sing_in_bloc/sign_in_bloc.dart';
 import 'package:myapp/screens/auth/views/welcome_screen.dart';
-import 'package:myapp/screens/home/views/home_screen.dart';
+
 import 'package:myapp/screens/search/SearchPage.dart';
 import 'package:myapp/screens/home/views/home_tab_container_page/home_tab_container_page.dart';
 import 'package:myapp/screens/home/blocs/get_university_bloc/get_university_bloc.dart';
