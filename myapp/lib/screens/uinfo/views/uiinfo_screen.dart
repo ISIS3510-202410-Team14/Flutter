@@ -6,6 +6,8 @@ import 'package:myapp/screens/uinfo/views/Requeriments_panel.dart';
 import 'package:myapp/widgets/app_bar/custom_app_bar.dart';
 import 'package:myapp/widgets/app_bar/appbar_leading_image.dart';
 import 'package:university_repository/university_repository.dart';
+import 'dart:io';
+import 'package:myapp/widgets/image_service.dart';
 
 import 'package:flutter/material.dart';
 import 'package:accordion/accordion.dart';
@@ -16,6 +18,7 @@ class UinfoScreen extends StatefulWidget {
   final University university;
   final FirebaseAnalytics analytics = FirebaseAnalytics.instance;
   UinfoScreen(this.university, {Key? key}) : super(key: key);
+  final ImageService _imageService = ImageService();
 
   @override
   _UinfoScreenState createState() => _UinfoScreenState();
@@ -50,25 +53,52 @@ class _UinfoScreenState extends State<UinfoScreen> {
         padding: const EdgeInsets.symmetric(horizontal: 16),
         child: Column(
           children: [
-            Container(
-              width: MediaQuery.of(context).size.width,
-              height: MediaQuery.of(context).size.height * 0.2,
-              decoration: BoxDecoration(
-                color: Colors.black.withOpacity(1),
-                borderRadius: BorderRadius.circular(30),
-                boxShadow: [
-                  BoxShadow(
-                    color: Color.fromARGB(255, 17, 17, 17),
-                    offset: Offset(3, 3),
-                    blurRadius: 5,
-                  ),
-                ],
-                image: DecorationImage(
-                  image: NetworkImage(widget.university.image), // Changed to dynamic image URL
-                  fit: BoxFit.fill,
-                ),
+            FutureBuilder<File>(
+                future: widget._imageService.loadImage(widget.university.image, 'uni_${widget.university.universityId}.jpg'),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.done && snapshot.hasData) {
+                    return Container(
+                      width: MediaQuery.of(context).size.width,
+                      height: MediaQuery.of(context).size.height * 0.2,
+                      decoration: BoxDecoration(
+                        color: Colors.black.withOpacity(1),
+                        borderRadius: BorderRadius.circular(30),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Color.fromARGB(255, 17, 17, 17),
+                            offset: Offset(3, 3),
+                            blurRadius: 5,
+                          ),
+                        ],
+                        image: DecorationImage(
+                          image: FileImage(snapshot.data!), 
+                          fit: BoxFit.fill,
+                        ),
+                      ),
+                    );
+                  } else if (snapshot.hasError) {
+                    return Container(
+                      width: MediaQuery.of(context).size.width,
+                      height: MediaQuery.of(context).size.height * 0.2,
+                      decoration: BoxDecoration(
+                        color: Colors.grey,
+                        borderRadius: BorderRadius.circular(30),
+                      ),
+                      child: Center(child: Text('Failed to load image')),
+                    );
+                  } else {
+                    return Container(
+                      width: MediaQuery.of(context).size.width,
+                      height: MediaQuery.of(context).size.height * 0.2,
+                      decoration: BoxDecoration(
+                        color: Colors.black.withOpacity(0.5),
+                        borderRadius: BorderRadius.circular(30),
+                      ),
+                      child: Center(child: CircularProgressIndicator()),
+                    );
+                  }
+                },
               ),
-            ),
             SizedBox(height: 20),
             Container(
               decoration: BoxDecoration(
