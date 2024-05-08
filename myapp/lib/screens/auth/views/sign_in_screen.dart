@@ -41,6 +41,17 @@ class _SignInScreenState extends State<SignInScreen> {
 						_errorMsg = 'Invalid email or password';
 					});
 				}
+        else if(state is SingInNoConnection) {
+          setState(() {
+            signInRequired = false;
+          });
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('No internet connection, try again later'),
+              duration: Duration(seconds: 3),
+            )
+          );
+        }
 			},
 			child: Form(
         key: _formKey,
