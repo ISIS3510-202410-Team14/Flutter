@@ -1,27 +1,34 @@
+import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/material.dart';
 import 'package:myapp/core/app_export.dart';
 import 'package:myapp/screens/uinfo/views/expansion_panel.dart';
+import 'package:myapp/screens/uinfo/views/Requeriments_panel.dart';
 import 'package:myapp/widgets/app_bar/custom_app_bar.dart';
 import 'package:myapp/widgets/app_bar/appbar_leading_image.dart';
 import 'package:university_repository/university_repository.dart';
-
-import '../../../URequirements/view/ureq_screen.dart';
 
 import 'package:flutter/material.dart';
 import 'package:accordion/accordion.dart';
 import 'package:accordion/controllers.dart';
 
-import 'package:firebase_analytics/firebase_analytics.dart';
-class UinfoScreen extends StatelessWidget {
+
+class UinfoScreen extends StatefulWidget {
   final University university;
   final FirebaseAnalytics analytics = FirebaseAnalytics.instance;
   UinfoScreen(this.university, {Key? key}) : super(key: key);
 
-  
+  @override
+  _UinfoScreenState createState() => _UinfoScreenState();
+}
+
+class _UinfoScreenState extends State<UinfoScreen> {
+  bool showRequirements = false;
+  bool showExpansionPanel = true;
+
   @override
   Widget build(BuildContext context) {
-     analytics.logEvent(name: 'uinfo_screen_entered', parameters: {
-      'university_id': university.universityId,
+    widget.analytics.logEvent(name: 'uinfo_screen_entered', parameters: {
+      'university_id': widget.university.universityId,
     });
     final theme = Theme.of(context);
 
@@ -31,8 +38,8 @@ class UinfoScreen extends StatelessWidget {
         leading: IconButton(
           icon: Icon(Icons.arrow_back_ios),
           onPressed: () {
-            analytics.logEvent(name: 'uinfo_screen_abandoned', parameters: {
-              'university_id': university.universityId,
+            widget.analytics.logEvent(name: 'uinfo_screen_abandoned', parameters: {
+              'university_id': widget.university.universityId,
             });
             Navigator.of(context).pop();
           },
@@ -57,7 +64,7 @@ class UinfoScreen extends StatelessWidget {
                   ),
                 ],
                 image: DecorationImage(
-                  image: NetworkImage(university.image), // Changed to dynamic image URL
+                  image: NetworkImage(widget.university.image), // Changed to dynamic image URL
                   fit: BoxFit.fill,
                 ),
               ),
@@ -86,7 +93,7 @@ class UinfoScreen extends StatelessWidget {
                         Expanded(
                           flex: 2,
                           child: Text(
-                            university.name, // Changed to dynamic university name
+                            widget.university.name, // Changed to dynamic university name
                             style: theme.textTheme.titleMedium!,
                             textAlign: TextAlign.center,
                           ),
@@ -103,8 +110,9 @@ class UinfoScreen extends StatelessWidget {
                               SizedBox(width: 8.0),
                               Expanded(
                                 flex: 2,
-                                child: Text(
-                                university.country,
+                                child: 
+                              Text(
+                                widget.university.country,
                                 style: theme.textTheme.titleMedium!.copyWith(color: Colors.blue),
                                 ),
                               ),
@@ -125,13 +133,13 @@ class UinfoScreen extends StatelessWidget {
               children: [
                 GestureDetector(
                   onTap: () {
-                    analytics.logEvent(name: 'requirements_clicked', parameters: {
-                      'university_id': university.universityId,
+                    widget.analytics.logEvent(name: 'requirements_clicked', parameters: {
+                      'university_id': widget.university.universityId,
                     });
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => UReqScreen(university)),
-                    );
+                    setState(() {
+                      showRequirements = true;
+                      showExpansionPanel = false;
+                    });
                   },
                   child: Column(
                     children: [
@@ -148,31 +156,39 @@ class UinfoScreen extends StatelessWidget {
                     ],
                   ),
                 ),
-                Column(
-                  children: [
-                    Container(
-                      height: 30.adaptSize,
-                      width: 30.adaptSize,
-                      padding: EdgeInsets.symmetric(
-                        horizontal: 3.h,
-                        vertical: 2.v,
+                GestureDetector(
+                  onTap: () {
+                    setState(() {
+                      showRequirements = false;
+                      showExpansionPanel = true;
+                    });
+                  },
+                  child: Column(
+                    children: [
+                      Container(
+                        height: 30.adaptSize,
+                        width: 30.adaptSize,
+                        padding: EdgeInsets.symmetric(
+                          horizontal: 3.h,
+                          vertical: 2.v,
+                        ),
+                        decoration: AppDecoration.fillBluegray10001.copyWith(
+                          borderRadius: BorderRadiusStyle.roundedBorder16,
+                        ),
+                        child: CustomImageView(
+                          imagePath: ImageConstant.imgUniversity,
+                          height: 26.v,
+                          width: 23.h,
+                          alignment: Alignment.center,
+                        ),
                       ),
-                      decoration: AppDecoration.fillBluegray10001.copyWith(
-                        borderRadius: BorderRadiusStyle.roundedBorder16,
+                      SizedBox(height: 4.v),
+                      Text(
+                        "University Info",
+                        style: theme.textTheme.bodySmall,
                       ),
-                      child: CustomImageView(
-                        imagePath: ImageConstant.imgUniversity,
-                        height: 26.v,
-                        width: 23.h,
-                        alignment: Alignment.center,
-                      ),
-                    ),
-                    SizedBox(height: 4.v),
-                    Text(
-                      "University Info",
-                      style: theme.textTheme.bodySmall,
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
                 Column(
                   children: [
@@ -203,7 +219,9 @@ class UinfoScreen extends StatelessWidget {
               ],
             ),
             Expanded(
-              child: AccordionApp(),
+              child: showRequirements
+                  ? RequerimentsPanel()
+                  : (showExpansionPanel ? AccordionPage() : Container()),
             ),
           ],
         ),
