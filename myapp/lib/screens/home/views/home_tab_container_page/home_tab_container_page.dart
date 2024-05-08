@@ -10,10 +10,11 @@ import 'package:myapp/screens/search/searchpage.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:university_repository/university_repository.dart';  // Asegúrate de que la ruta es correcta
 import 'package:firebase_performance/firebase_performance.dart';
+import 'package:firebase_analytics/firebase_analytics.dart';
 
 class HomeTabContainerPage extends StatefulWidget {
   const HomeTabContainerPage({Key? key}) : super(key: key);
-
+  
   @override
   HomeTabContainerPageState createState() => HomeTabContainerPageState();
 }
@@ -23,6 +24,7 @@ class HomeTabContainerPageState extends State<HomeTabContainerPage> with TickerP
   List<University> favoriteUniversities = [];
   late Trace userInteractionTrace;
   final ImageService _imageService = ImageService();
+ 
 
   @override
   void initState() {
@@ -72,9 +74,11 @@ class HomeTabContainerPageState extends State<HomeTabContainerPage> with TickerP
   }
 
   PreferredSizeWidget _buildAppBar(BuildContext context) {
+    final FirebaseAnalytics analytics = FirebaseAnalytics.instance;
     return AppBar(
       title: InkWell(
         onTap: () {
+          analytics.logEvent(name: 'search_screen_entered');
           Navigator.push(
             context,
             MaterialPageRoute(builder: (context) => SearchPage()),
