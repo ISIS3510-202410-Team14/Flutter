@@ -2,10 +2,9 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:location/location.dart';
-import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 
 class MapScreen extends StatefulWidget {
-  const MapScreen({super.key});
+  const MapScreen({Key? key}) : super(key: key);
 
   @override
   State<MapScreen> createState() => _MapScreenState();
@@ -20,9 +19,7 @@ class _MapScreenState extends State<MapScreen> {
   static const LatLng _pMelbourne = const LatLng(-37.7963, 144.9614);
   static const LatLng _pUniversidadJaveriana = const LatLng(4.6385, -74.0821);
 
-
   LatLng? _currentP;
-  Map<PolylineId, Polyline> _polylines = {};
 
   @override
   void initState() {
@@ -33,22 +30,24 @@ class _MapScreenState extends State<MapScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: _currentP == null ? const Center(child: Text("Loading location..."))
-        : GoogleMap(
-            onMapCreated: (GoogleMapController controller) {
-              _mapController.complete(controller);
-            },
-            initialCameraPosition: CameraPosition(target: _currentP!, zoom: 13),
-            markers: {
-              Marker(markerId: const MarkerId('_cityUHongKong'), position: _pCityUHongKong),
-              Marker(markerId: const MarkerId('_PLosAndes'), position: _PLosAndes),
-              Marker(markerId: const MarkerId('_pUniversidadDePorto'), position: _pUniversidadDePorto),
-              Marker(markerId: const MarkerId('_pMelbourne'), position: _pMelbourne),
-              Marker(markerId: const MarkerId('_pUniversidadJaveriana'), position: _pUniversidadJaveriana),
-              if (_currentP != null) Marker(markerId: const MarkerId('_currentP'), position: _currentP!),
-            },
-            polylines: Set<Polyline>.of(_polylines.values),
-          ),
+      body: _currentP == null
+          ? const Center(child: Text("Loading location..."))
+          : GoogleMap(
+        onMapCreated: (GoogleMapController controller) {
+          _mapController.complete(controller);
+        },
+        initialCameraPosition: CameraPosition(target: _currentP!, zoom: 13),
+        mapType: MapType.normal,
+        liteModeEnabled: false,
+        markers: {
+          Marker(markerId: const MarkerId('_cityUHongKong'), position: _pCityUHongKong),
+          Marker(markerId: const MarkerId('_PLosAndes'), position: _PLosAndes),
+          Marker(markerId: const MarkerId('_pUniversidadDePorto'), position: _pUniversidadDePorto),
+          Marker(markerId: const MarkerId('_pMelbourne'), position: _pMelbourne),
+          Marker(markerId: const MarkerId('_pUniversidadJaveriana'), position: _pUniversidadJaveriana),
+          if (_currentP != null) Marker(markerId: const MarkerId('_currentP'), position: _currentP!),
+        },
+      ),
     );
   }
 
@@ -74,41 +73,7 @@ class _MapScreenState extends State<MapScreen> {
           _currentP = LatLng(currentLocation.latitude!, currentLocation.longitude!);
         });
         _cameraToPosition(_currentP!);
-        getPolyline();
       }
-    });
-  }
-
-  Future<void> getPolyline() async {
-    PolylinePoints polylinePoints = PolylinePoints();
-    PolylineResult result = await polylinePoints.getRouteBetweenCoordinates(
-      "AIzaSyB4A_kbz5UCmInC8_LbyFBAXdmSqdzibzI", // Replace with your actual API Key
-      PointLatLng(_currentP!.latitude, _currentP!.longitude),
-      PointLatLng(_PLosAndes.latitude, _PLosAndes.longitude),
-      travelMode: TravelMode.driving,
-    );
-
-    if (result.points.isNotEmpty) {
-      List<LatLng> polylineCoordinates = result.points
-          .map((point) => LatLng(point.latitude, point.longitude))
-          .toList();
-      generatePolyLineFromPoints(polylineCoordinates);
-    } else {
-      print('Error: ${result.errorMessage}');
-    }
-  }
-  
-  void generatePolyLineFromPoints(List<LatLng> polylineCoordinates) {
-    PolylineId id = const PolylineId("route");
-    Polyline polyline = Polyline(
-      polylineId: id,
-      color: Colors.blue,
-      points: polylineCoordinates,
-      width: 5,
-    );
-
-    setState(() {
-      _polylines[id] = polyline;
     });
   }
 
