@@ -41,7 +41,21 @@ class _SignUpScreenState extends State<SignUpScreen> {
 					  signUpRequired = true;
 					});
 				} else if(state is SignUpFailure) {
-					return;
+					setState(() {
+            signUpRequired = false;
+          });
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Sign up failed, due to connection matters, try later'),
+              duration: const Duration(seconds: 5),
+              action: SnackBarAction(
+                label: 'Close',
+                onPressed: () {
+                  ScaffoldMessenger.of(context).hideCurrentSnackBar();
+                },
+              ),
+            ),
+          );
 				} 
 			},
 			child: Form(

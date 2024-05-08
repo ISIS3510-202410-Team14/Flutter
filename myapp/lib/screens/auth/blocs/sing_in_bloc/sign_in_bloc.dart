@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:user_repository/user_repository.dart';
@@ -16,7 +18,12 @@ class SignInBloc extends Bloc<SignInEvent, SignInState> {
       try {
         await _userRepository.singIn(event.email, event.password);
       } catch (e) {
-        emit(SignInFailure());
+        if (e.toString().contains('[firebase_auth/network-request-failed]')){
+            emit(SingInNoConnection());
+        } else {
+          log("Noway");
+          emit(SignInFailure());
+        }
       }
     });
     
