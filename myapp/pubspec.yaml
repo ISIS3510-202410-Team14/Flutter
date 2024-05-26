@@ -40,6 +40,10 @@ dependencies:
 
   university_repository:
     path: packages/university_repository
+
+  residence_repository:
+    path: packages/residence_repository 
+    
   accordion: ^2.6.0
   flutter_animate: ^4.5.0
   firebase_crashlytics: ^3.5.4
