@@ -5,6 +5,7 @@ import 'package:myapp/screens/map/views/map_screen.dart';
 import 'package:myapp/screens/UChatbot/views/chatbot_screen.dart';
 
 import 'package:myapp/screens/search/SearchPage.dart';
+import 'package:myapp/screens/upload/views/docsview.dart';
 
 import 'package:myapp/widgets/custom_bottom_bar.dart';
 import 'package:myapp/core/app_export.dart';
@@ -54,7 +55,7 @@ class _HomeContainerScreenState extends State<HomeContainerScreen> {
       case BottomBarEnum.Locationon:
         return AppRoutes.map;
       case  BottomBarEnum.Documentscanner:
-        return AppRoutes.searchPage; // Assuming there is a document scanner page
+        return AppRoutes.uploadScreen; // Assuming there is a document scanner page
       case BottomBarEnum.Lock:
         return AppRoutes.chatbotScreen;
       default:
@@ -75,6 +76,9 @@ class _HomeContainerScreenState extends State<HomeContainerScreen> {
 
       case AppRoutes.chatbotScreen:
         return ChatbotScreen();
+
+      case AppRoutes.uploadScreen:
+        return UploadScreen();
       // Add other cases as necessary
 
       default:
