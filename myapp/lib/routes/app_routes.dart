@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:myapp/screens/upload/views/docsview.dart';
 
 
 import '../screens/uinfo/views/uiinfo_screen.dart';
@@ -28,6 +29,7 @@ class AppRoutes {
   static const String chatbotScreen = '/chatbot_screen';
   static const String map = '/map_screen';
   static const String searchPage = '/search_page';
+  static const String uploadScreen = '/upload_screen';
   static final Map<String, WidgetBuilder> routes = {
     homePage: (context) => HomePage(),
     homeContainerScreen: (context) => HomeContainerScreen(),
@@ -35,6 +37,7 @@ class AppRoutes {
     searchPage: (context) => SearchPage(),
     map: (context) => MapScreen(),
     chatbotScreen: (context) => ChatbotScreen(),
+    uploadScreen: (context) => UploadScreen(),
 
   };
 }

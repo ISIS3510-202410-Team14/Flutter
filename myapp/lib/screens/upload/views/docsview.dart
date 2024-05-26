@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:myapp/core/app_export.dart';
 import 'package:path/path.dart' as path;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:file_picker/file_picker.dart';
@@ -15,6 +16,8 @@ class _UploadScreenState extends State<UploadScreen> {
   String? formPath;
   String? motivationalLetterPath;
   String? familyLetterPath;
+  double _uploadProgress = 0.0;
+  bool _isUploading = false;
 
   Future<void> pickFile(String documentType) async {
     FilePickerResult? result = await FilePicker.platform.pickFiles();
@@ -38,9 +41,25 @@ class _UploadScreenState extends State<UploadScreen> {
     Reference storageReference =
         FirebaseStorage.instance.ref().child('documents/$documentType/$fileName');
     UploadTask uploadTask = storageReference.putFile(File(filePath));
+
+    setState(() {
+      _isUploading = true;
+      _uploadProgress = 0.0;
+    });
+
+    uploadTask.snapshotEvents.listen((TaskSnapshot snapshot) {
+      setState(() {
+        _uploadProgress = snapshot.bytesTransferred / snapshot.totalBytes;
+      });
+    });
+
     await uploadTask.whenComplete(() async {
       String fileURL = await storageReference.getDownloadURL();
       await saveFilePath(documentType, fileURL);
+      setState(() {
+        _isUploading = false;
+        _uploadProgress = 0.0;
+      });
     });
   }
 
@@ -61,9 +80,9 @@ class _UploadScreenState extends State<UploadScreen> {
       child: Container(
         width: double.infinity,
         height: 100,
-        margin: EdgeInsets.all(8.0),
+        margin: EdgeInsets.symmetric(vertical: 16.0, horizontal: 16.0),
         decoration: BoxDecoration(
-          border: Border.all(color: Colors.blue),
+          border: Border.all(color: Colors.orange),
           borderRadius: BorderRadius.circular(8.0),
         ),
         child: Center(
@@ -79,11 +98,34 @@ class _UploadScreenState extends State<UploadScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Upload Documents'),
-      ),
       body: Column(
         children: [
+          SizedBox(height: 40),
+          Row(
+            children: [
+              IconButton(
+                icon: Icon(Icons.arrow_back),
+                onPressed: () => Navigator.of(context).pop(),
+              ),
+            ],
+          ),
+          Image.asset(
+            'assets/images/image.png',
+            height: 100,
+            fit: BoxFit.cover,
+          ),
+          SizedBox(height: 30),
+          Text(
+            'Move On Upload Documents',
+            style: theme.textTheme.titleLarge!.copyWith(color: Colors.black),
+          ),
+          SizedBox(height: 16),
+          if (_isUploading)
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16.0),
+              child: LinearProgressIndicator(value: _uploadProgress),
+            ),
+          SizedBox(height: 16),
           uploadBox('form', formPath, 'Filled Form'),
           uploadBox('motivationalLetter', motivationalLetterPath, 'Motivational Letter'),
           uploadBox('familyLetter', familyLetterPath, 'Family Letter'),
