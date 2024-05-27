@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:connectivity_plus/connectivity_plus.dart';
 import '../openai.dart';
 
 class ChatbotScreen extends StatefulWidget {
@@ -13,11 +14,13 @@ class _ChatbotScreenState extends State<ChatbotScreen> {
   List<Map<String, String>> _conversation = [];
   bool _showInitialMessage = true;
   late ScrollController _scrollController;
+  bool _isConnected = true; // Inicialmente se asume que hay conexión
 
   @override
   void initState() {
     super.initState();
     _scrollController = ScrollController();
+    _checkInternetConnectivity(); // Verificar la conexión al iniciar la pantalla
   }
 
   @override
@@ -40,7 +43,7 @@ class _ChatbotScreenState extends State<ChatbotScreen> {
               _buildInputField(),
             ],
           ),
-          _showInitialMessage ? _buildInitialMessage() : SizedBox(),
+          _buildInitialMessage(),
         ],
       ),
     );
@@ -120,7 +123,7 @@ class _ChatbotScreenState extends State<ChatbotScreen> {
   }
 
   Widget _buildInitialMessage() {
-    return Positioned(
+    return _showInitialMessage ? Positioned(
       top: MediaQuery.of(context).size.height * 0.4,
       left: 0,
       right: 0,
@@ -129,12 +132,12 @@ class _ChatbotScreenState extends State<ChatbotScreen> {
         alignment: Alignment.center,
         color: Color(0xFFFFE7C4),
         child: Text(
-          'Hello! How can I help you today?',
+          _isConnected ? 'Hello! How can I help you today?' : 'No internet connection. Please check your connection and try again.',
           textAlign: TextAlign.center,
           style: TextStyle(fontSize: 16.0),
         ),
       ),
-    );
+    ) : SizedBox();
   }
 
   void _sendMessage() async {
@@ -146,12 +149,16 @@ class _ChatbotScreenState extends State<ChatbotScreen> {
         _showInitialMessage = false;
       }
 
-      try {
-        String botResponse = await OpenAI.getCompletion(message);
-        _conversation.add({'sender': 'Chatbot', 'content': botResponse});
-      } catch (e) {
-        print('Error: $e');
-        _conversation.add({'sender': 'Chatbot', 'content': 'Error occurred while fetching response'});
+      if (_isConnected) {
+        try {
+          String botResponse = await OpenAI.getCompletion(message);
+          _conversation.add({'sender': 'Chatbot', 'content': botResponse});
+        } catch (e) {
+          print('Error: $e');
+          _conversation.add({'sender': 'Chatbot', 'content': 'Error fetching response, try again later'});
+        }
+      } else {
+        _conversation.add({'sender': 'Chatbot', 'content': 'No internet connection'});
       }
 
       _textEditingController.clear();
@@ -160,7 +167,7 @@ class _ChatbotScreenState extends State<ChatbotScreen> {
   }
 
   void _scrollToBottom() {
-    WidgetsBinding.instance.addPostFrameCallback((_) {
+    WidgetsBinding.instance!.addPostFrameCallback((_) {
       if (_scrollController.hasClients) {
         _scrollController.animateTo(
           _scrollController.position.maxScrollExtent,
@@ -168,6 +175,13 @@ class _ChatbotScreenState extends State<ChatbotScreen> {
           curve: Curves.easeOut,
         );
       }
+    });
+  }
+
+  void _checkInternetConnectivity() async {
+    var connectivityResult = await (Connectivity().checkConnectivity());
+    setState(() {
+      _isConnected = (connectivityResult != ConnectivityResult.none);
     });
   }
 }
