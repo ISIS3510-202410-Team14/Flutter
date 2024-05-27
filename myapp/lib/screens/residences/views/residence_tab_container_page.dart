@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+import 'package:myapp/screens/residences/views/residence_detail_screen.dart';
 import 'package:myapp/widgets/image_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -111,16 +112,26 @@ Widget _buildCountryCarousel(BuildContext context, String country) {
 
 
 
-  Widget _buildResidenceItem(AsyncSnapshot<File> snapshot, Residence residence) {
-    Widget imageWidget;
-    if (snapshot.connectionState == ConnectionState.done && snapshot.hasData) {
-      imageWidget = Image.file(snapshot.data!, fit: BoxFit.cover);
-    } else if (snapshot.hasError || !snapshot.hasData) {
-      imageWidget = Image.network(residence.image, fit: BoxFit.cover);
-    } else {
-      imageWidget = CircularProgressIndicator();
-    }
-    return Container(
+Widget _buildResidenceItem(AsyncSnapshot<File> snapshot, Residence residence) {
+  Widget imageWidget;
+  if (snapshot.connectionState == ConnectionState.done && snapshot.hasData) {
+    imageWidget = Image.file(snapshot.data!, fit: BoxFit.cover);
+  } else if (snapshot.hasError || !snapshot.hasData) {
+    imageWidget = Image.network(residence.image, fit: BoxFit.cover);
+  } else {
+    imageWidget = CircularProgressIndicator();
+  }
+
+  return InkWell(
+    onTap: () {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => ResidenceDetailScreen(residence: residence),
+        ),
+      );
+    },
+    child: Container(
       width: 149,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(6),
@@ -147,6 +158,7 @@ Widget _buildCountryCarousel(BuildContext context, String country) {
           ),
         ],
       ),
+    ),
     );
   }
 
