@@ -10,6 +10,7 @@ import 'package:myapp/routes/app_routes.dart';
 import 'package:myapp/screens/home/views/home_container_screen/home_container_screen.dart';
 import 'package:myapp/screens/auth/blocs/sing_in_bloc/sign_in_bloc.dart';
 import 'package:myapp/screens/auth/views/welcome_screen.dart';
+import 'package:myapp/screens/residences/get_residence_bloc/get_residence_bloc.dart';
 
 import 'package:myapp/screens/search/SearchPage.dart';
 import 'package:myapp/screens/home/views/home_tab_container_page/home_tab_container_page.dart';
@@ -17,6 +18,7 @@ import 'package:myapp/screens/home/blocs/get_university_bloc/get_university_bloc
 import 'package:myapp/screens/map/views/map_screen.dart';
 import 'package:myapp/screens/uinfo/views/expansion_panel.dart';
 import 'package:myapp/screens/uinfo/views/uiinfo_screen.dart';
+import 'package:residence_repository/residence_repository.dart';
 import 'package:university_repository/university_repository.dart';
 
 class MyAppView extends StatefulWidget {
@@ -77,6 +79,11 @@ class _MyAppViewState extends State<MyAppView> {
                             create: (context) => GetUniversityBloc(
                               FirebaseUniversityRepo(),
                             )..add(GetUniversity()),
+                          ),
+                          BlocProvider(
+                            create: (context) => GetResidenceBloc(
+                              FirebaseResidenceRepo(),
+                            )..add(GetResidence()),
                           ),
                         ],
                         child: HomeContainerScreen(),

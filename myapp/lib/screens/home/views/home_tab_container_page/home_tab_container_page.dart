@@ -1,5 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
+import 'package:flutter/foundation.dart';
+import 'package:myapp/screens/residences/views/residence_tab_container_page.dart';
 import 'package:myapp/widgets/image_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -22,6 +24,7 @@ class HomeTabContainerPage extends StatefulWidget {
 class HomeTabContainerPageState extends State<HomeTabContainerPage> with TickerProviderStateMixin {
   late TabController tabviewController;
   List<University> favoriteUniversities = [];
+  List<String> countriesToShow = []; // Lista de países para mostrar
   late Trace userInteractionTrace;
   final ImageService _imageService = ImageService();
 
@@ -36,6 +39,7 @@ class HomeTabContainerPageState extends State<HomeTabContainerPage> with TickerP
     loadFavorites().then((loadedFavorites) {
       setState(() {
         favoriteUniversities = loadedFavorites;
+        countriesToShow = loadedFavorites.map((uni) => uni.country).toSet().toList();
       });
     });
   }
@@ -133,9 +137,17 @@ class HomeTabContainerPageState extends State<HomeTabContainerPage> with TickerP
           Spacer(),
           Padding(
             padding: EdgeInsets.symmetric(vertical: 5.v),
-            child: Text(
-              "See all",
-              style: CustomTextStyles.labelMediumOrange700,
+            child: InkWell(
+              onTap: () {
+                Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => TabResidencePage(countriesToShow: countriesToShow)),
+              );  // Navega a la página anterior
+              },
+              child: Text(
+                "See all",
+                style: CustomTextStyles.labelMediumOrange700,
+              ),
             ),
           ),
         ],
@@ -144,72 +156,90 @@ class HomeTabContainerPageState extends State<HomeTabContainerPage> with TickerP
   }
 
   Widget _buildCarousel(BuildContext context) {
-    return SizedBox(
-      height: 210.v,
-      child: BlocBuilder<GetUniversityBloc, GetUniversityState>(
-        builder: (context, state) {
-          if (state is GetUniversitySuccess) {
-            return ListView.separated(
-              padding: EdgeInsets.only(left: 10.h, right: 16.h),
-              scrollDirection: Axis.horizontal,
-              separatorBuilder: (context, index) => SizedBox(width: 8.h),
-              itemCount: state.universitys.length,
-              itemBuilder: (context, index) {
-                String localFileName = 'uni_${state.universitys[index].universityId}.jpg';
-                return FutureBuilder<File>(
-                  future: _imageService.loadImage(state.universitys[index].image, localFileName),
-                  builder: (context, snapshot) {
-                    Widget imageWidget;
-                    if (snapshot.connectionState == ConnectionState.done && snapshot.hasData) {
-                      imageWidget = Image.file(snapshot.data!, fit: BoxFit.cover);
-                    } else if (snapshot.hasError || !snapshot.hasData) {
-                      // Fallback to network image or placeholder if local loading fails
-                      imageWidget = Image.network(state.universitys[index].image, fit: BoxFit.cover);
-                    } else {
-                      return CircularProgressIndicator();
-                    }
-                    return Container(
-                      width: 149,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(6),
-                      ),
-                      child: Stack(
-                        fit: StackFit.expand,
-                        children: [
-                          imageWidget,
-                          Container(
-                            padding: EdgeInsets.symmetric(horizontal: 16, vertical: 15),
-                            decoration: AppDecoration.gradientWhiteAToBlack.copyWith(
-                              borderRadius: BorderRadiusStyle.roundedBorder28,
-                            ),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              mainAxisAlignment: MainAxisAlignment.end,
-                              children: [
-                                Text(
-                                  state.universitys[index].country,
-                                  style: CustomTextStyles.titleMediumWhiteA700,
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
-                    );
+  return SizedBox(
+    height: 210.v,
+    child: BlocBuilder<GetUniversityBloc, GetUniversityState>(
+      builder: (context, state) {
+        if (state is GetUniversitySuccess) {
+          Set<String> currentCountries = countriesToShow.toSet();
+          state.universitys.forEach((uni) {
+            currentCountries.add(uni.country);
+          });
+          Future.delayed(Duration.zero, () {
+            if (!listEquals(countriesToShow, currentCountries.toList())) {
+              setState(() {
+                countriesToShow = currentCountries.toList();
+              });
+            }
+          });
+          return ListView.separated(
+            padding: EdgeInsets.only(left: 10.h, right: 16.h),
+            scrollDirection: Axis.horizontal,
+            separatorBuilder: (context, index) => SizedBox(width: 8.h),
+            itemCount: state.universitys.length,
+            itemBuilder: (context, index) {
+              String localFileName = 'uni_${state.universitys[index].universityId}.jpg';
+              return FutureBuilder<File>(
+                future: _imageService.loadImage(state.universitys[index].image, localFileName),
+                builder: (context, snapshot) {
+                  Widget imageWidget;
+                  if (snapshot.connectionState == ConnectionState.done && snapshot.hasData) {
+                    imageWidget = Image.file(snapshot.data!, fit: BoxFit.cover);
+                  } else if (snapshot.hasError || !snapshot.hasData) {
+                    // Fallback to network image or placeholder if local loading fails
+                    imageWidget = Image.network(state.universitys[index].image, fit: BoxFit.cover);
+                  } else {
+                    return CircularProgressIndicator();
+                  }
+                  return InkWell(
+                  onTap: () {
+                    List<String> singleCountryList = [state.universitys[index].country];
+                    Navigator.of(context).push(MaterialPageRoute(builder: (context) => TabResidencePage(countriesToShow: singleCountryList)));
                   },
-                );
-              },
-            );
-          } else if (state is GetUniversityLoading) {
-            return const Center(child: CircularProgressIndicator());
-          } else {
-            return const Center(child: Text("An error has occurred..."));
-          }
-        },
-      ),
-    );
-  }
+                  child: Container(
+                    width: 149,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(6),
+                    ),
+                    child: Stack(
+                      fit: StackFit.expand,
+                      children: [
+                        imageWidget,
+                        Container(
 
+                          padding: EdgeInsets.symmetric(horizontal: 16, vertical: 15),
+                          decoration: AppDecoration.gradientWhiteAToBlack.copyWith(
+                            borderRadius: BorderRadiusStyle.roundedBorder28,
+                          ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            children: [
+                              
+                              Text(
+                                state.universitys[index].country,
+                                style: CustomTextStyles.titleMediumWhiteA700,
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  );
+                },
+              );
+            },
+          );
+        } else if (state is GetUniversityLoading) {
+          return const Center(child: CircularProgressIndicator());
+        } else {
+          return const Center(child: Text("An error has occurred..."));
+        }
+      },
+    ),
+  );
+}
 
   Widget _buildTabview(BuildContext context) {
     return Container(
