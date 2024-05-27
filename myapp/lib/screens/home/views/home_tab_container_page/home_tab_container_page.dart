@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+import 'package:myapp/screens/residences/views/residence_tab_container_page.dart';
 import 'package:myapp/widgets/image_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -133,9 +134,17 @@ class HomeTabContainerPageState extends State<HomeTabContainerPage> with TickerP
           Spacer(),
           Padding(
             padding: EdgeInsets.symmetric(vertical: 5.v),
-            child: Text(
-              "See all",
-              style: CustomTextStyles.labelMediumOrange700,
+            child: InkWell(
+              onTap: () {
+                Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => TabResidencePage()),
+              );  // Navega a la página anterior
+              },
+              child: Text(
+                "See all",
+                style: CustomTextStyles.labelMediumOrange700,
+              ),
             ),
           ),
         ],
