@@ -30,10 +30,15 @@ class CustomBottomBarState extends State<CustomBottomBar> {
       type: BottomBarEnum.Documentscanner,
     ),
     BottomMenuModel(
+      icon: ImageConstant.imgChat,
+      activeIcon: ImageConstant.imgChat,
+      type: BottomBarEnum.Chatbot,
+    ),
+    BottomMenuModel(
       icon: ImageConstant.imgLock,
       activeIcon: ImageConstant.imgLock,
       type: BottomBarEnum.Lock,
-    )
+    ),
   ];
 
   @override
@@ -83,6 +88,7 @@ enum BottomBarEnum {
   Locationon,
   Documentscanner,
   Lock,
+  Chatbot,
 }
 
 class BottomMenuModel {

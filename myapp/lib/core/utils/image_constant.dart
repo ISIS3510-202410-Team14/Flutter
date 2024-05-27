@@ -52,5 +52,7 @@ class ImageConstant {
 
   static String imgLock = '$imagePath/img_lock.svg';
 
+  static String imgChat = '$imagePath/Chat_white.png';
+
   static String imageNotFound = 'assets/images/image_not_found.png';
 }

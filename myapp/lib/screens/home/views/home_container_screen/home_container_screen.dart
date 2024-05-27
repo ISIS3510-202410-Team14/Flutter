@@ -10,6 +10,8 @@ import 'package:myapp/screens/upload/views/docsview.dart';
 import 'package:myapp/widgets/custom_bottom_bar.dart';
 import 'package:myapp/core/app_export.dart';
 
+import '../../../profile/views/profile_screen.dart';
+
 class HomeContainerScreen extends StatefulWidget {
   HomeContainerScreen({Key? key}) : super(key: key);
 
@@ -27,7 +29,9 @@ class _HomeContainerScreenState extends State<HomeContainerScreen> {
         body: Navigator(
           key: _navigatorKey,
           initialRoute: AppRoutes.homeTabContainerPage,
-          onGenerateRoute: (routeSetting) => PageRouteBuilder(
+
+
+           onGenerateRoute: (routeSetting) => PageRouteBuilder(
             pageBuilder: (ctx, ani, ani1) => Directionality(
               textDirection: TextDirection.ltr, 
               child: _getCurrentPage(routeSetting.name!)
@@ -56,8 +60,10 @@ class _HomeContainerScreenState extends State<HomeContainerScreen> {
         return AppRoutes.map;
       case  BottomBarEnum.Documentscanner:
         return AppRoutes.uploadScreen; // Assuming there is a document scanner page
-      case BottomBarEnum.Lock:
+      case BottomBarEnum.Chatbot:
         return AppRoutes.chatbotScreen;
+      case BottomBarEnum.Lock:
+        return AppRoutes.profileScreen;
       default:
         return AppRoutes.homeTabContainerPage;
     }
@@ -79,6 +85,9 @@ class _HomeContainerScreenState extends State<HomeContainerScreen> {
 
       case AppRoutes.uploadScreen:
         return UploadScreen();
+
+      case AppRoutes.profileScreen:
+        return ProfileScreen();
       // Add other cases as necessary
 
       default:
