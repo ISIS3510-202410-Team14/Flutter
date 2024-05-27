@@ -1,9 +1,95 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:user_repository/user_repository.dart';
 import '../../auth/views/welcome_screen.dart';
 
-class ProfileScreen extends StatelessWidget {
+class ProfileScreen extends StatefulWidget {
+  @override
+  _ProfileScreenState createState() => _ProfileScreenState();
+}
+
+class _ProfileScreenState extends State<ProfileScreen> {
   final UserRepository userRepository = FirebaseUserRepo();
+  late MyUser _localUser;
+  late StreamSubscription<ConnectivityResult> _connectivitySubscription;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadLocalUser();
+    _checkInternetConnection().then((isConnected) {
+      if (!isConnected) {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text('No internet connection. Data may not be up to date.'),
+        ));
+      }
+    });
+    _connectivitySubscription = Connectivity().onConnectivityChanged.listen((ConnectivityResult result) {
+      if (result != ConnectivityResult.none) {
+        _syncLocalData();
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _connectivitySubscription.cancel();
+    super.dispose();
+  }
+
+  Future<bool> _checkInternetConnection() async {
+    var connectivityResult = await Connectivity().checkConnectivity();
+    return (connectivityResult != ConnectivityResult.none);
+  }
+
+  Future<void> _loadLocalUser() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final userId = prefs.getString('userId') ?? '';
+      final name = prefs.getString('name') ?? '';
+      final email = prefs.getString('email') ?? '';
+      final gpa = prefs.getDouble('gpa') ?? 0.0;
+      final certificateEnglish = prefs.getBool('certificateEnglish') ?? false;
+      setState(() {
+        _localUser = MyUser(
+          userId: userId,
+          name: name,
+          email: email,
+          gpa: gpa,
+          certificateEnglish: certificateEnglish,
+        );
+      });
+    } catch (e) {
+      print('Error loading local user data: $e');
+    }
+  }
+
+  Future<void> _syncLocalData() async {
+    try {
+      final updatedUser = await userRepository.user.first;
+      setState(() {
+        _localUser = updatedUser!;
+      });
+      await _saveProfileLocally(updatedUser!);
+    } catch (e) {
+      print('Error syncing local data: $e');
+    }
+  }
+
+
+  Future<void> _saveProfileLocally(MyUser updatedUser) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      prefs.setString('userId', updatedUser.userId);
+      prefs.setString('name', updatedUser.name);
+      prefs.setDouble('gpa', updatedUser.gpa);
+      prefs.setBool('certificateEnglish', updatedUser.certificateEnglish);
+    } catch (e) {
+      print('Error saving profile locally: $e');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -13,7 +99,7 @@ class ProfileScreen extends StatelessWidget {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return CircularProgressIndicator();
         } else {
-          final user = snapshot.data;
+          final user = snapshot.data ?? _localUser;
           return Scaffold(
             appBar: AppBar(
               title: Text('Profile'),
@@ -30,11 +116,10 @@ class ProfileScreen extends StatelessWidget {
                     ),
                   ),
                   SizedBox(height: 20),
-                  _buildProfileItem('Name', user?.name ?? ''),
-                  // Eliminado el campo de correo electrónico
-                  _buildProfileItem('Email', user?.email ?? ''),
-                  _buildProfileItem('English Certificate', user?.certificateEnglish.toString() ?? ''),
-                  _buildProfileItem('GPA', user?.gpa.toString() ?? ''),
+                  _buildProfileItem('Name', user.name),
+                  _buildProfileItem('Email', user.email),
+                  _buildProfileItem('English Certificate', user.certificateEnglish.toString()),
+                  _buildProfileItem('GPA', user.gpa.toString()),
                   SizedBox(height: 20),
                   _buildProfileButton(context, 'Edit Profile', () {
                     _editProfile(context, user);
@@ -89,10 +174,9 @@ class ProfileScreen extends StatelessWidget {
   }
 
   void _editProfile(BuildContext context, MyUser? user) {
-    final _nameController = TextEditingController(text: user?.name);
-    // Eliminado el campo de correo electrónico
-    final _gpaController = TextEditingController(text: user?.gpa.toString());
-    bool _certificateEnglish = user?.certificateEnglish ?? false;
+    final _nameController = TextEditingController(text: _localUser.name);
+    final _gpaController = TextEditingController(text: _localUser.gpa.toString());
+    bool _certificateEnglish = _localUser.certificateEnglish;
 
     showDialog(
       context: context,
@@ -110,7 +194,6 @@ class ProfileScreen extends StatelessWidget {
                       controller: _nameController,
                       decoration: InputDecoration(labelText: 'Name'),
                     ),
-                    // Eliminado el campo de correo electrónico
                     TextField(
                       controller: _gpaController,
                       decoration: InputDecoration(labelText: 'GPA'),
@@ -136,7 +219,7 @@ class ProfileScreen extends StatelessWidget {
                 ),
                 TextButton(
                   onPressed: () {
-                    _saveProfile(context, user!.userId, _nameController, _gpaController, _certificateEnglish);
+                    _saveProfile(context, _localUser.userId, _nameController, _gpaController, _certificateEnglish);
                     Navigator.of(context).pop();
                   },
                   child: Text('Save'),
@@ -150,16 +233,27 @@ class ProfileScreen extends StatelessWidget {
   }
 
   void _saveProfile(BuildContext context, String userId, TextEditingController _nameController,
-      TextEditingController _gpaController, bool _certificateEnglish) {
+      TextEditingController _gpaController, bool _certificateEnglish) async {
     try {
       final updatedUser = MyUser(
         userId: userId,
         name: _nameController.text,
-        email: '', // No se permite cambiar el correo
+        email: _localUser.email, // No cambia el email
         gpa: double.tryParse(_gpaController.text) ?? 0.0,
         certificateEnglish: _certificateEnglish,
       );
-      userRepository.setUserData(updatedUser);
+
+      // Actualiza la vista con la información actualizada en el caché
+      setState(() {
+        _localUser = updatedUser;
+      });
+
+      // Guarda los cambios en el caché
+      await _saveProfileLocally(updatedUser);
+
+      // Envía los cambios a Firebase
+      await userRepository.setUserData(updatedUser);
+
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Profile updated successfully')));
     } catch (e) {
       print('Error during profile update: $e');
@@ -167,8 +261,16 @@ class ProfileScreen extends StatelessWidget {
     }
   }
 
+
   void _signOut(BuildContext context) {
     try {
+      final prefs = SharedPreferences.getInstance();
+      prefs.then((prefs) {
+        prefs.remove('userId');
+        prefs.remove('name');
+        prefs.remove('gpa');
+        prefs.remove('certificateEnglish');
+      });
       userRepository.logOut();
       Navigator.pushAndRemoveUntil(
         context,
