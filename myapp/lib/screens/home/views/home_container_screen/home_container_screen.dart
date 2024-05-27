@@ -27,7 +27,9 @@ class _HomeContainerScreenState extends State<HomeContainerScreen> {
         body: Navigator(
           key: _navigatorKey,
           initialRoute: AppRoutes.homeTabContainerPage,
-          onGenerateRoute: (routeSetting) => PageRouteBuilder(
+
+
+           onGenerateRoute: (routeSetting) => PageRouteBuilder(
             pageBuilder: (ctx, ani, ani1) => Directionality(
               textDirection: TextDirection.ltr, 
               child: _getCurrentPage(routeSetting.name!)
