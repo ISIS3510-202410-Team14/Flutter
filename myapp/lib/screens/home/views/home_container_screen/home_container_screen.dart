@@ -58,6 +58,8 @@ class _HomeContainerScreenState extends State<HomeContainerScreen> {
         return AppRoutes.map;
       case  BottomBarEnum.Documentscanner:
         return AppRoutes.uploadScreen; // Assuming there is a document scanner page
+      case BottomBarEnum.Chatbot:
+        return AppRoutes.chatbotScreen;
       case BottomBarEnum.Lock:
         return AppRoutes.chatbotScreen;
       default:
