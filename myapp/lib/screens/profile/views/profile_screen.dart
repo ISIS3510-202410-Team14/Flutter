@@ -22,12 +22,14 @@ class ProfileScreen extends StatelessWidget {
             SizedBox(height: 20),
             _buildProfileItem('Name', 'John Doe'),
             _buildProfileItem('Email', 'john.doe@example.com'),
+            _buildProfileItem('University', 'Sample University'), // Añade el nombre de la universidad del usuario
+            _buildProfileItem('GPA', '3.8'), // Añade el GPA del usuario
             SizedBox(height: 20),
             _buildProfileButton(context, 'Edit Profile', () {
-              // Add navigation logic to edit profile screen
+              // Agrega la lógica de navegación a la pantalla de edición de perfil
             }),
             _buildProfileButton(context, 'Sign Out', () {
-              // Add sign out logic
+              // Agrega la lógica de cierre de sesión
             }),
           ],
         ),
@@ -57,15 +59,16 @@ class ProfileScreen extends StatelessWidget {
 
   Widget _buildProfileButton(BuildContext context, String label, VoidCallback onPressed) {
     return Padding(
-      padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+      padding: EdgeInsets.symmetric(horizontal: 30, vertical: 10), // Reducir el espacio horizontal
       child: ElevatedButton(
         onPressed: onPressed,
         style: ElevatedButton.styleFrom(
-          padding: EdgeInsets.all(15), backgroundColor: Colors.orange,
+          padding: EdgeInsets.all(15),
+          backgroundColor: Colors.orange,
         ),
         child: Text(
           label,
-          style: TextStyle(fontSize: 16),
+          style: TextStyle(fontSize: 16, color: Colors.white), // Establece el color del texto en blanco
         ),
       ),
     );
