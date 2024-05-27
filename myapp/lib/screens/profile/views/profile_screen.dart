@@ -1,5 +1,7 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:user_repository/user_repository.dart';
 import '../../auth/views/welcome_screen.dart';
 
@@ -11,11 +13,35 @@ class ProfileScreen extends StatefulWidget {
 class _ProfileScreenState extends State<ProfileScreen> {
   final UserRepository userRepository = FirebaseUserRepo();
   late MyUser _localUser;
+  late StreamSubscription<ConnectivityResult> _connectivitySubscription;
 
   @override
   void initState() {
     super.initState();
     _loadLocalUser();
+    _checkInternetConnection().then((isConnected) {
+      if (!isConnected) {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text('No internet connection. Data may not be up to date.'),
+        ));
+      }
+    });
+    _connectivitySubscription = Connectivity().onConnectivityChanged.listen((ConnectivityResult result) {
+      if (result != ConnectivityResult.none) {
+        _syncLocalData();
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _connectivitySubscription.cancel();
+    super.dispose();
+  }
+
+  Future<bool> _checkInternetConnection() async {
+    var connectivityResult = await Connectivity().checkConnectivity();
+    return (connectivityResult != ConnectivityResult.none);
   }
 
   Future<void> _loadLocalUser() async {
@@ -37,6 +63,31 @@ class _ProfileScreenState extends State<ProfileScreen> {
       });
     } catch (e) {
       print('Error loading local user data: $e');
+    }
+  }
+
+  Future<void> _syncLocalData() async {
+    try {
+      final updatedUser = await userRepository.user.first;
+      setState(() {
+        _localUser = updatedUser!;
+      });
+      await _saveProfileLocally(updatedUser!);
+    } catch (e) {
+      print('Error syncing local data: $e');
+    }
+  }
+
+
+  Future<void> _saveProfileLocally(MyUser updatedUser) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      prefs.setString('userId', updatedUser.userId);
+      prefs.setString('name', updatedUser.name);
+      prefs.setDouble('gpa', updatedUser.gpa);
+      prefs.setBool('certificateEnglish', updatedUser.certificateEnglish);
+    } catch (e) {
+      print('Error saving profile locally: $e');
     }
   }
 
@@ -191,10 +242,18 @@ class _ProfileScreenState extends State<ProfileScreen> {
         gpa: double.tryParse(_gpaController.text) ?? 0.0,
         certificateEnglish: _certificateEnglish,
       );
-      await userRepository.setUserData(updatedUser); // Aquí actualizamos la información en Firebase
+
+      // Actualiza la vista con la información actualizada en el caché
       setState(() {
-        _localUser = updatedUser; // Actualizamos la información local
+        _localUser = updatedUser;
       });
+
+      // Guarda los cambios en el caché
+      await _saveProfileLocally(updatedUser);
+
+      // Envía los cambios a Firebase
+      await userRepository.setUserData(updatedUser);
+
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Profile updated successfully')));
     } catch (e) {
       print('Error during profile update: $e');
@@ -205,7 +264,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   void _signOut(BuildContext context) {
     try {
-      // Borrar datos de usuario local al cerrar sesión
       final prefs = SharedPreferences.getInstance();
       prefs.then((prefs) {
         prefs.remove('userId');
