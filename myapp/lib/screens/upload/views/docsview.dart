@@ -63,6 +63,35 @@ class _UploadScreenState extends State<UploadScreen> {
     });
   }
 
+  Future<void> removeFile(String documentType) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? fileURL;
+    if (documentType == 'form') {
+      fileURL = prefs.getString('formURL');
+    } else if (documentType == 'motivationalLetter') {
+      fileURL = prefs.getString('motivationalLetterURL');
+    } else if (documentType == 'familyLetter') {
+      fileURL = prefs.getString('familyLetterURL');
+    }
+
+    if (fileURL != null) {
+      Reference storageReference = FirebaseStorage.instance.refFromURL(fileURL);
+      await storageReference.delete();
+
+      setState(() {
+        if (documentType == 'form') {
+          formPath = null;
+        } else if (documentType == 'motivationalLetter') {
+          motivationalLetterPath = null;
+        } else if (documentType == 'familyLetter') {
+          familyLetterPath = null;
+        }
+      });
+
+      await prefs.remove(documentType == 'form' ? 'formURL' : documentType == 'motivationalLetter' ? 'motivationalLetterURL' : 'familyLetterURL');
+    }
+  }
+
   Future<void> saveFilePath(String documentType, String fileURL) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     if (documentType == 'form') {
@@ -75,61 +104,72 @@ class _UploadScreenState extends State<UploadScreen> {
   }
 
   Widget uploadBox(String documentType, String? filePath, String title) {
-    return GestureDetector(
-      onTap: () => pickFile(documentType),
-      child: Container(
-        width: double.infinity,
-        height: 100,
-        margin: EdgeInsets.symmetric(vertical: 16.0, horizontal: 16.0),
-        decoration: BoxDecoration(
-          border: Border.all(color: Colors.orange),
-          borderRadius: BorderRadius.circular(8.0),
-        ),
-        child: Center(
-          child: Text(
-            filePath == null ? 'Upload $title' : path.basename(filePath),
-            style: TextStyle(fontSize: 16),
+    return Column(
+      children: [
+        GestureDetector(
+          onTap: () => pickFile(documentType),
+          child: Container(
+            width: double.infinity,
+            height: 100,
+            margin: EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
+            decoration: BoxDecoration(
+              border: Border.all(color: Colors.orange),
+              borderRadius: BorderRadius.circular(8.0),
+            ),
+            child: Center(
+              child: Text(
+                filePath == null ? 'Upload $title' : path.basename(filePath),
+                style: TextStyle(fontSize: 16),
+              ),
+            ),
           ),
         ),
-      ),
+        if (filePath != null)
+          ElevatedButton(
+            onPressed: () => removeFile(documentType),
+            child: Text('Remove $title'),
+          ),
+      ],
     );
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Column(
-        children: [
-          SizedBox(height: 40),
-          Row(
-            children: [
-              IconButton(
-                icon: Icon(Icons.arrow_back),
-                onPressed: () => Navigator.of(context).pop(),
-              ),
-            ],
-          ),
-          Image.asset(
-            'assets/images/image.png',
-            height: 100,
-            fit: BoxFit.cover,
-          ),
-          SizedBox(height: 30),
-          Text(
-            'Move On Upload Documents',
-            style: theme.textTheme.titleLarge!.copyWith(color: Colors.black),
-          ),
-          SizedBox(height: 16),
-          if (_isUploading)
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16.0),
-              child: LinearProgressIndicator(value: _uploadProgress),
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
+            SizedBox(height: 40),
+            Row(
+              children: [
+                IconButton(
+                  icon: Icon(Icons.arrow_back),
+                  onPressed: () => Navigator.of(context).pop(),
+                ),
+              ],
             ),
-          SizedBox(height: 16),
-          uploadBox('form', formPath, 'Filled Form'),
-          uploadBox('motivationalLetter', motivationalLetterPath, 'Motivational Letter'),
-          uploadBox('familyLetter', familyLetterPath, 'Family Letter'),
-        ],
+            Image.asset(
+              'assets/images/image.png',
+              height: 100,
+              fit: BoxFit.cover,
+            ),
+            SizedBox(height: 30),
+            Text(
+              'Move On Upload Documents',
+              style: theme.textTheme.titleLarge!.copyWith(color: Colors.black),
+            ),
+            SizedBox(height: 16),
+            if (_isUploading)
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                child: LinearProgressIndicator(value: _uploadProgress),
+              ),
+            SizedBox(height: 16),
+            uploadBox('form', formPath, 'Filled Form'),
+            uploadBox('motivationalLetter', motivationalLetterPath, 'Motivational Letter'),
+            uploadBox('familyLetter', familyLetterPath, 'Family Letter'),
+          ],
+        ),
       ),
     );
   }
