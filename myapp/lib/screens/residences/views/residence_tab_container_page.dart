@@ -60,38 +60,56 @@ Widget _buildCarousel(BuildContext context) {
     );
   }
 
-  Widget _buildCountryCarousel(BuildContext context, String country) {
-    return Padding(
-      padding: EdgeInsets.only(bottom: 10),
-      child: BlocBuilder<GetResidenceBloc, GetResidenceState>(
-        builder: (context, state) {
-          if (state is GetResidenceSuccess) {
-            // Filtrar las residencias por país antes de mostrarlas
-            var filteredResidences = state.residences.where((residence) => residence.country == country).toList();
-            return ListView.separated(
-              padding: EdgeInsets.only(left: 10.h, right: 16.h),
-              scrollDirection: Axis.horizontal,
-              separatorBuilder: (context, index) => SizedBox(width: 8.h),
-              itemCount: filteredResidences.length,
-              itemBuilder: (context, index) {
-                String localFileName = 'uni_${filteredResidences[index].residenceId}.jpg';
-                return FutureBuilder<File>(
-                  future: _imageService.loadImage(filteredResidences[index].image, localFileName),
-                  builder: (context, snapshot) {
-                    return _buildResidenceItem(snapshot, filteredResidences[index]);
-                  },
-                );
-              },
+Widget _buildCountryCarousel(BuildContext context, String country) {
+    return BlocBuilder<GetResidenceBloc, GetResidenceState>(
+      builder: (context, state) {
+        if (state is GetResidenceSuccess) {
+          var filteredResidences = state.residences.where((residence) => residence.country == country).toList();
+          if (filteredResidences.isNotEmpty) {
+            return Column(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 16),
+                  child: Text(country, style: CustomTextStyles.titleSmallPoppins),
+                ),
+                Padding(
+                  padding: EdgeInsets.only(bottom: 10),
+                  child: SizedBox(
+                    height: 200, // Set a fixed height for the ListView
+                    child: ListView.separated(
+                      padding: EdgeInsets.only(left: 10.h, right: 16.h),
+                      scrollDirection: Axis.horizontal,
+                      separatorBuilder: (context, index) => SizedBox(width: 8.h),
+                      itemCount: filteredResidences.length,
+                      itemBuilder: (context, index) {
+                        String localFileName = 'uni_${filteredResidences[index].residenceId}.jpg';
+                        return FutureBuilder<File>(
+                          future: _imageService.loadImage(filteredResidences[index].image, localFileName),
+                          builder: (context, snapshot) {
+                            return _buildResidenceItem(snapshot, filteredResidences[index]);
+                          },
+                        );
+                      },
+                    ),
+                  ),
+                ),
+              ],
             );
-          } else if (state is GetResidenceLoading) {
-            return const Center(child: CircularProgressIndicator());
           } else {
-            return const Center(child: Text("An error has occurred..."));
+            return Container(); // Return an empty container if there are no residences
           }
-        },
-      ),
+        } else if (state is GetResidenceLoading) {
+          return const Center(child: CircularProgressIndicator());
+        } else {
+          return const Center(child: Text("An error has occurred..."));
+        }
+      },
     );
   }
+
+
+
+
 
   Widget _buildResidenceItem(AsyncSnapshot<File> snapshot, Residence residence) {
     Widget imageWidget;
