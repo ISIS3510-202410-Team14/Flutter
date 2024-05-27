@@ -12,16 +12,17 @@ import 'package:residence_repository/residence_repository.dart';  // Asegúrate 
 import 'package:firebase_performance/firebase_performance.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 
-class HomeTabContainerPage extends StatefulWidget {
-  const HomeTabContainerPage({Key? key}) : super(key: key);
-  
+class TabResidencePage extends StatefulWidget {
+  const TabResidencePage({Key? key, required this.countriesToShow}) : super(key: key);
+  final List<String> countriesToShow;
+
   @override
-  HomeTabContainerPageState createState() => HomeTabContainerPageState();
+  TabResidencePageState createState() => TabResidencePageState();
 }
 
-class HomeTabContainerPageState extends State<HomeTabContainerPage> with TickerProviderStateMixin {
-  late TabController tabviewController;
-  List<Residence> favoriteUniversities = [];
+class TabResidencePageState extends State<TabResidencePage> with TickerProviderStateMixin {
+  
+  
   late Trace userInteractionTrace;
   final ImageService _imageService = ImageService();
  
@@ -29,240 +30,108 @@ class HomeTabContainerPageState extends State<HomeTabContainerPage> with TickerP
   @override
   void initState() {
     super.initState();
-    tabviewController = TabController(length: 5, vsync: this);
-    tabviewController.addListener(_handleTabSelection);
-    userInteractionTrace = FirebasePerformance.instance.newTrace("tab_interaction_time");
-    userInteractionTrace.start();  // Iniciar el rastro cuando la vista se carga
-    loadFavorites().then((loadedFavorites) {
-      setState(() {
-        favoriteUniversities = loadedFavorites;
-      });
-    });
+ // Iniciar el rastro cuando la vista se carga
+
   }
 
   @override
   void dispose() {
-    tabviewController.dispose();
+    
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: _buildAppBar(context),
       body: SingleChildScrollView(
         child: Column(
           children: [
-            _buildArchiveCoun(context),
-            SizedBox(height: 26),
             _buildCarousel(context),
-            SizedBox(height: 28),
-            Align(
-              alignment: Alignment.centerLeft,
-              child: Padding(
-                padding: const EdgeInsets.only(left: 16),
-                child: Text("Top Universities!", style: CustomTextStyles.titleSmallPoppins),
-              ),
-            ),
-            SizedBox(height: 6),
-            _buildTabview(context),
-            _buildTabBarView(context, favoriteUniversities),
           ],
         ),
       ),
     );
   }
 
-  PreferredSizeWidget _buildAppBar(BuildContext context) {
-    final FirebaseAnalytics analytics = FirebaseAnalytics.instance;
-    return AppBar(
-      title: InkWell(
-        onTap: () {
-          analytics.logEvent(name: 'search_screen_entered');
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => SearchPage()),
-          );
-        },
-        child: Container(
-          height: 40,  // Ajusta la altura según necesidad
-          padding: EdgeInsets.symmetric(horizontal: 10),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(20),
-            border: Border.all(color: Colors.grey.shade300),
-          ),
-          child: Row(
-            children: [
-              Icon(Icons.search, color: Colors.grey),
-              SizedBox(width: 10),
-              Text('Find Your Exchange', style: TextStyle(fontSize: 16, color: Colors.grey)),
-            ],
-          ),
-        ),
-      ),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(20),
-      ),
-      elevation: 0,
-      automaticallyImplyLeading: false,
-      backgroundColor: Colors.transparent,
+
+Widget _buildCarousel(BuildContext context) {
+    return Column(
+      children: widget.countriesToShow.map((country) => _buildCountryCarousel(context, country)).toList(),
     );
   }
 
-
-
-  Widget _buildArchiveCoun(BuildContext context) {
+  Widget _buildCountryCarousel(BuildContext context, String country) {
     return Padding(
-      padding: EdgeInsets.only(left: 22.h, right: 16.h),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          CustomImageView(
-            imagePath: ImageConstant.imgLinkedin,
-            height: 28.v,
-            width: 23.h,
-          ),
-          Padding(
-            padding: EdgeInsets.only(left: 7.h, top: 4.v, bottom: 5.v),
-            child: Text(
-              "Countries",
-              style: theme.textTheme.labelLarge,
-            ),
-          ),
-          Spacer(),
-          Padding(
-            padding: EdgeInsets.symmetric(vertical: 5.v),
-            child: Text(
-              "See all",
-              style: CustomTextStyles.labelMediumOrange700,
-            ),
-          ),
-        ],
+      padding: EdgeInsets.only(bottom: 10),
+      child: BlocBuilder<GetResidenceBloc, GetResidenceState>(
+        builder: (context, state) {
+          if (state is GetResidenceSuccess) {
+            // Filtrar las residencias por país antes de mostrarlas
+            var filteredResidences = state.residences.where((residence) => residence.country == country).toList();
+            return ListView.separated(
+              padding: EdgeInsets.only(left: 10.h, right: 16.h),
+              scrollDirection: Axis.horizontal,
+              separatorBuilder: (context, index) => SizedBox(width: 8.h),
+              itemCount: filteredResidences.length,
+              itemBuilder: (context, index) {
+                String localFileName = 'uni_${filteredResidences[index].residenceId}.jpg';
+                return FutureBuilder<File>(
+                  future: _imageService.loadImage(filteredResidences[index].image, localFileName),
+                  builder: (context, snapshot) {
+                    return _buildResidenceItem(snapshot, filteredResidences[index]);
+                  },
+                );
+              },
+            );
+          } else if (state is GetResidenceLoading) {
+            return const Center(child: CircularProgressIndicator());
+          } else {
+            return const Center(child: Text("An error has occurred..."));
+          }
+        },
       ),
     );
   }
 
-  Widget _buildCarousel(BuildContext context) {
-  return SizedBox(
-    height: 210.v,
-    child: BlocBuilder<GetResidenceBloc, GetResidenceState>(
-      builder: (context, state) {
-        if (state is GetResidenceSuccess) {
-          return ListView.separated(
-            padding: EdgeInsets.only(left: 10.h, right: 16.h),
-            scrollDirection: Axis.horizontal,
-            separatorBuilder: (context, index) => SizedBox(width: 8.h),
-            itemCount: state.residences.length,
-            itemBuilder: (context, index) {
-              String localFileName = 'uni_${state.residences[index].residenceId}.jpg';
-              return FutureBuilder<File>(
-                future: _imageService.loadImage(state.residences[index].image, localFileName),
-                builder: (context, snapshot) {
-                  Widget imageWidget;
-                  if (snapshot.connectionState == ConnectionState.done && snapshot.hasData) {
-                    imageWidget = Image.file(snapshot.data!, fit: BoxFit.cover);
-                  } else if (snapshot.hasError || !snapshot.hasData) {
-                    // Fallback to network image or placeholder if local loading fails
-                    imageWidget = Image.network(state.residences[index].image, fit: BoxFit.cover);
-                  } else {
-                    return CircularProgressIndicator();
-                  }
-                  return Container(
-                    width: 149,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(6),
-                    ),
-                    child: Stack(
-                      fit: StackFit.expand,
-                      children: [
-                        imageWidget,
-                        Container(
-                          padding: EdgeInsets.symmetric(horizontal: 16, vertical: 15),
-                          decoration: AppDecoration.gradientWhiteAToBlack.copyWith(
-                            borderRadius: BorderRadiusStyle.roundedBorder28,
-                          ),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            mainAxisAlignment: MainAxisAlignment.end,
-                            children: [
-                              Text(
-                                state.residences[index].country,
-                                style: CustomTextStyles.titleMediumWhiteA700,
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                  );
-                },
-              );
-            },
-          );
-        } else if (state is GetResidenceLoading) {
-          return const Center(child: CircularProgressIndicator());
-        } else {
-          return const Center(child: Text("An error has occurred..."));
-        }
-      },
-    ),
-  );
-}
-
-
-  Widget _buildTabview(BuildContext context) {
+  Widget _buildResidenceItem(AsyncSnapshot<File> snapshot, Residence residence) {
+    Widget imageWidget;
+    if (snapshot.connectionState == ConnectionState.done && snapshot.hasData) {
+      imageWidget = Image.file(snapshot.data!, fit: BoxFit.cover);
+    } else if (snapshot.hasError || !snapshot.hasData) {
+      imageWidget = Image.network(residence.image, fit: BoxFit.cover);
+    } else {
+      imageWidget = CircularProgressIndicator();
+    }
     return Container(
-      height: 18.v,
-      width: 379.h,
-      child: TabBar(
-        controller: tabviewController,
-        labelPadding: EdgeInsets.zero,
-        labelColor: appTheme.orange700,
-        unselectedLabelColor: appTheme.black900,
-        tabs: [
-          Tab(child: Text("All")),
-          Tab(child: Text("Popular")),
-          Tab(child: Text("Recom")),
-          Tab(child: Text("Viewed")),
-          Tab(child: Text("Fav")),
-        ],
+      width: 149,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(6),
       ),
-    );
-  }
-
-  Widget _buildTabBarView(BuildContext context, List<Residence> favoriteUniversities) {
-    return SizedBox(
-      height: 275.v,
-      child: TabBarView(
-        controller: tabviewController,
+      child: Stack(
+        fit: StackFit.expand,
         children: [
-          HomePage(),
-          HomePage(),
-          HomePage(),
-          HomePage(),
-          HomePage(),
+          imageWidget,
+          Container(
+            padding: EdgeInsets.symmetric(horizontal: 16, vertical: 15),
+            decoration: AppDecoration.gradientWhiteAToBlack.copyWith(
+              borderRadius: BorderRadiusStyle.roundedBorder28,
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                Text(
+                  residence.name,
+                  style: CustomTextStyles.titleMediumWhiteA700,
+                ),
+              ],
+            ),
+          ),
         ],
       ),
     );
   }
 
-  Future<List<Residence>> loadFavorites() async {
-    final prefs = await SharedPreferences.getInstance();
-    List<String> favorites = prefs.getStringList('favorites') ?? [];
-    // Utiliza un Set para eliminar duplicados.
-    Set<Residence> uniqueFavorites = {};
-    for (String string in favorites) {
-      uniqueFavorites.add(Residence.fromJson(json.decode(string)));
-    }
-    // Convierte el Set a una lista antes de devolverla.
-    return uniqueFavorites.toList();
-  }
 
 
- void _handleTabSelection() {
-    if (tabviewController.indexIsChanging) {
-      userInteractionTrace.stop();  // Detener y enviar el rastro cuando se selecciona una pestaña
-    }
-  }
 }
