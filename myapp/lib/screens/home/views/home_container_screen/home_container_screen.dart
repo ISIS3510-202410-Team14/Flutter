@@ -10,6 +10,8 @@ import 'package:myapp/screens/upload/views/docsview.dart';
 import 'package:myapp/widgets/custom_bottom_bar.dart';
 import 'package:myapp/core/app_export.dart';
 
+import '../../../profile/views/profile_screen.dart';
+
 class HomeContainerScreen extends StatefulWidget {
   HomeContainerScreen({Key? key}) : super(key: key);
 
@@ -61,7 +63,7 @@ class _HomeContainerScreenState extends State<HomeContainerScreen> {
       case BottomBarEnum.Chatbot:
         return AppRoutes.chatbotScreen;
       case BottomBarEnum.Lock:
-        return AppRoutes.chatbotScreen;
+        return AppRoutes.profileScreen;
       default:
         return AppRoutes.homeTabContainerPage;
     }
@@ -83,6 +85,9 @@ class _HomeContainerScreenState extends State<HomeContainerScreen> {
 
       case AppRoutes.uploadScreen:
         return UploadScreen();
+
+      case AppRoutes.profileScreen:
+        return ProfileScreen();
       // Add other cases as necessary
 
       default:
