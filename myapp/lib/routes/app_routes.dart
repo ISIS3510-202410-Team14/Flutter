@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:myapp/screens/upload/views/docsview.dart';
 
 
+import '../screens/profile/views/profile_screen.dart';
 import '../screens/uinfo/views/uiinfo_screen.dart';
 import '../screens/UChatbot/views/chatbot_screen.dart';
 import '../screens/home/views/home_page/home_page.dart';
@@ -30,6 +31,7 @@ class AppRoutes {
   static const String map = '/map_screen';
   static const String searchPage = '/search_page';
   static const String uploadScreen = '/upload_screen';
+  static const String profileScreen = '/profile_screen';
   static final Map<String, WidgetBuilder> routes = {
     homePage: (context) => HomePage(),
     homeContainerScreen: (context) => HomeContainerScreen(),
@@ -38,6 +40,6 @@ class AppRoutes {
     map: (context) => MapScreen(),
     chatbotScreen: (context) => ChatbotScreen(),
     uploadScreen: (context) => UploadScreen(),
-
+    profileScreen: (context) => ProfileScreen(),
   };
 }
