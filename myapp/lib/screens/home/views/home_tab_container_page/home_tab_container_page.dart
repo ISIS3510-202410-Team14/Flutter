@@ -16,7 +16,7 @@ import 'package:firebase_analytics/firebase_analytics.dart';
 
 class HomeTabContainerPage extends StatefulWidget {
   const HomeTabContainerPage({Key? key}) : super(key: key);
-  
+
   @override
   HomeTabContainerPageState createState() => HomeTabContainerPageState();
 }
@@ -27,7 +27,7 @@ class HomeTabContainerPageState extends State<HomeTabContainerPage> with TickerP
   List<String> countriesToShow = []; // Lista de países para mostrar
   late Trace userInteractionTrace;
   final ImageService _imageService = ImageService();
- 
+
 
   @override
   void initState() {
@@ -241,7 +241,6 @@ class HomeTabContainerPageState extends State<HomeTabContainerPage> with TickerP
   );
 }
 
-
   Widget _buildTabview(BuildContext context) {
     return Container(
       height: 18.v,
@@ -291,7 +290,7 @@ class HomeTabContainerPageState extends State<HomeTabContainerPage> with TickerP
   }
 
 
- void _handleTabSelection() {
+  void _handleTabSelection() {
     if (tabviewController.indexIsChanging) {
       userInteractionTrace.stop();  // Detener y enviar el rastro cuando se selecciona una pestaña
     }
