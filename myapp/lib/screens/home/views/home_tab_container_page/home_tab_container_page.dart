@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+import 'package:flutter/foundation.dart';
 import 'package:myapp/screens/residences/views/residence_tab_container_page.dart';
 import 'package:myapp/widgets/image_service.dart';
 import 'package:flutter/material.dart';
@@ -23,6 +24,7 @@ class HomeTabContainerPage extends StatefulWidget {
 class HomeTabContainerPageState extends State<HomeTabContainerPage> with TickerProviderStateMixin {
   late TabController tabviewController;
   List<University> favoriteUniversities = [];
+  List<String> countriesToShow = []; // Lista de países para mostrar
   late Trace userInteractionTrace;
   final ImageService _imageService = ImageService();
  
@@ -37,6 +39,7 @@ class HomeTabContainerPageState extends State<HomeTabContainerPage> with TickerP
     loadFavorites().then((loadedFavorites) {
       setState(() {
         favoriteUniversities = loadedFavorites;
+        countriesToShow = loadedFavorites.map((uni) => uni.country).toSet().toList();
       });
     });
   }
@@ -138,7 +141,7 @@ class HomeTabContainerPageState extends State<HomeTabContainerPage> with TickerP
               onTap: () {
                 Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => TabResidencePage()),
+                MaterialPageRoute(builder: (context) => TabResidencePage(countriesToShow: countriesToShow)),
               );  // Navega a la página anterior
               },
               child: Text(
@@ -158,6 +161,17 @@ class HomeTabContainerPageState extends State<HomeTabContainerPage> with TickerP
     child: BlocBuilder<GetUniversityBloc, GetUniversityState>(
       builder: (context, state) {
         if (state is GetUniversitySuccess) {
+          Set<String> currentCountries = countriesToShow.toSet();
+          state.universitys.forEach((uni) {
+            currentCountries.add(uni.country);
+          });
+          Future.delayed(Duration.zero, () {
+            if (!listEquals(countriesToShow, currentCountries.toList())) {
+              setState(() {
+                countriesToShow = currentCountries.toList();
+              });
+            }
+          });
           return ListView.separated(
             padding: EdgeInsets.only(left: 10.h, right: 16.h),
             scrollDirection: Axis.horizontal,
@@ -177,7 +191,12 @@ class HomeTabContainerPageState extends State<HomeTabContainerPage> with TickerP
                   } else {
                     return CircularProgressIndicator();
                   }
-                  return Container(
+                  return InkWell(
+                  onTap: () {
+                    List<String> singleCountryList = [state.universitys[index].country];
+                    Navigator.of(context).push(MaterialPageRoute(builder: (context) => TabResidencePage(countriesToShow: singleCountryList)));
+                  },
+                  child: Container(
                     width: 149,
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(6),
@@ -187,6 +206,7 @@ class HomeTabContainerPageState extends State<HomeTabContainerPage> with TickerP
                       children: [
                         imageWidget,
                         Container(
+
                           padding: EdgeInsets.symmetric(horizontal: 16, vertical: 15),
                           decoration: AppDecoration.gradientWhiteAToBlack.copyWith(
                             borderRadius: BorderRadiusStyle.roundedBorder28,
@@ -195,6 +215,7 @@ class HomeTabContainerPageState extends State<HomeTabContainerPage> with TickerP
                             crossAxisAlignment: CrossAxisAlignment.start,
                             mainAxisAlignment: MainAxisAlignment.end,
                             children: [
+                              
                               Text(
                                 state.universitys[index].country,
                                 style: CustomTextStyles.titleMediumWhiteA700,
@@ -204,6 +225,7 @@ class HomeTabContainerPageState extends State<HomeTabContainerPage> with TickerP
                         ),
                       ],
                     ),
+                  ),
                   );
                 },
               );
